@@ -7,6 +7,7 @@ from typing import List, Tuple, Dict
 from tqdm import tqdm
 import numpy as np
 from dataset_class import EntityDataset
+from torch.optim.lr_scheduler import ReduceLROnPlateau 
 
 TXT_FILE_PATH = '/home/mohamed/repos/nlp_proj/EN/raw-documents'
 
@@ -34,33 +35,42 @@ class EntityClassifier(nn.Module):
         # Classification heads
         hidden_size = 768  # GPT2's hidden size
         
+        # # Main classifier with multiple layers
+        # self.main_classifier = nn.Sequential(
+        #     nn.Linear(hidden_size, 512),
+        #     nn.LayerNorm(512),
+        #     nn.ReLU(),
+        #     nn.Dropout(0.1),
+            
+        #     nn.Linear(512, 256),
+        #     nn.LayerNorm(256),
+        #     nn.ReLU(),
+        #     nn.Dropout(0.1),
+
+        #     nn.Linear(256, 256),
+        #     nn.LayerNorm(256),
+        #     nn.ReLU(),
+        #     nn.Dropout(0.1),
+            
+        #     nn.Linear(256, 128),
+        #     nn.LayerNorm(128),
+        #     nn.ReLU(),
+        #     nn.Dropout(0.1),
+
+        #     nn.Linear(128, 128),
+        #     nn.LayerNorm(128),
+        #     nn.ReLU(),
+        #     nn.Dropout(0.1),
+            
+        #     nn.Linear(128, len(self.main_classes))
+        # )
+        
         # Main classifier with multiple layers
         self.main_classifier = nn.Sequential(
-            nn.Linear(hidden_size, 512),
-            nn.LayerNorm(512),
-            nn.ReLU(),
-            nn.Dropout(0.1),
-            
-            nn.Linear(512, 256),
-            nn.LayerNorm(256),
-            nn.ReLU(),
-            nn.Dropout(0.1),
-
-            nn.Linear(256, 256),
-            nn.LayerNorm(256),
-            nn.ReLU(),
-            nn.Dropout(0.1),
-            
-            nn.Linear(256, 128),
+            nn.Linear(hidden_size, 128),
             nn.LayerNorm(128),
             nn.ReLU(),
             nn.Dropout(0.1),
-
-            nn.Linear(128, 128),
-            nn.LayerNorm(128),
-            nn.ReLU(),
-            nn.Dropout(0.1),
-            
             nn.Linear(128, len(self.main_classes))
         )
         
@@ -201,20 +211,20 @@ def evaluate_model(model, val_loader, device, dataset):
     print("\nClassification Report:\n")
     print(classification_report(all_labels, all_preds, target_names=dataset.main_classes))
 
-    # Plot confusion matrix
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', 
-                xticklabels=dataset.main_classes, 
-                yticklabels=dataset.main_classes)
-    plt.xlabel("Predicted")
-    plt.ylabel("True")
-    plt.title("Confusion Matrix")
-    plt.show()
+    # # Plot confusion matrix
+    # plt.figure(figsize=(10, 8))
+    # sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', 
+    #             xticklabels=dataset.main_classes, 
+    #             yticklabels=dataset.main_classes)
+    # plt.xlabel("Predicted")
+    # plt.ylabel("True")
+    # plt.title("Confusion Matrix")
+    # plt.show()
 
     return accuracy
 
 
-def train_model(data_file: str, epochs: int = 10, batch_size: int = 16, learning_rate: float = 1e-6):
+def train_model(data_file: str, epochs: int = 100, batch_size: int = 16, learning_rate: float = 1e-4):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     
@@ -244,9 +254,14 @@ def train_model(data_file: str, epochs: int = 10, batch_size: int = 16, learning
 
     model = EntityClassifier(freeze_base=True).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=0.01)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.05, patience=2) # Learning rate scheduler
     criterion = nn.CrossEntropyLoss()
     max_grad_norm = 1.0
 
+
+    val_accuracy = evaluate_model(model, val_loader, device, dataset)
+    print(f" INIT Validation Accuracy: {val_accuracy:.4f}")
+        
     for epoch in range(epochs):
         model.train()
         train_loss = 0
@@ -289,6 +304,8 @@ def train_model(data_file: str, epochs: int = 10, batch_size: int = 16, learning
                 continue
         
         avg_loss = train_loss / len(train_loader)
+        scheduler.step(avg_loss)  # Update learning rate based on training loss
+
         print(f"Epoch {epoch+1}/{epochs}, Average Loss: {avg_loss:.4f}")
         val_accuracy = evaluate_model(model, val_loader, device, dataset)
         print(f"Epoch {epoch+1}/{epochs}, Validation Accuracy: {val_accuracy:.4f}")
