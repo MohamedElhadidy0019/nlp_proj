@@ -1,0 +1,287 @@
+EN_UA_022051.txt,United Kingdom,159,172,Antagonist,Instigator
+EN_UA_022051.txt,London,368,373,Antagonist,Foreign Adversary
+EN_UA_022051.txt,Kiev,379,382,Antagonist,Foreign Adversary
+EN_UA_022051.txt,UK,1781,1782,Antagonist,Saboteur
+EN_UA_014413.txt,GRU,1660,1662,Antagonist,Spy
+EN_CC_100014.txt,Bill Gates,567,576,Antagonist,Conspirator
+EN_CC_100014.txt,Purina's Dumor,2271,2284,Antagonist,Conspirator
+EN_CC_100014.txt,Tractor Supply's Producer's Pride,2296,2328,Antagonist,Conspirator
+EN_CC_100014.txt,Conservatives,2930,2942,Innocent,Victim
+EN_CC_100014.txt,Republicans,2948,2958,Innocent,Victim
+EN_UA_300018.txt,Armed Forces of Ukraine,476,498,Antagonist,Terrorist
+EN_CC_100091.txt,Greta Thunberg,216,229,Innocent,Exploited
+EN_CC_200152.txt,Pentagon,398,405,Antagonist,Deceiver
+EN_CC_200152.txt,Gov. DeSantis,3781,3793,Protagonist,Rebel
+EN_UA_300040.txt,Ukrainian government,412,431,Antagonist,Terrorist
+EN_UA_300040.txt,Ukraine,888,894,Antagonist,Instigator,Tyrant
+EN_UA_300040.txt,Russian Federation,1358,1375,Protagonist,Guardian
+EN_UA_300040.txt,President Biden,1837,1851,Antagonist,Instigator
+EN_UA_300040.txt,Ukrainians,1912,1921,Innocent,Victim
+EN_UA_012611.txt,Russia,75,80,Innocent,Victim
+EN_UA_012611.txt,US,225,226,Antagonist,Conspirator
+EN_UA_012611.txt,Norway,1493,1498,Antagonist,Conspirator
+EN_UA_026036.txt,Russia,77,82,Antagonist,Instigator
+EN_UA_300034.txt,US,2131,2132,Antagonist,Conspirator
+EN_UA_014829.txt,Russia,1888,1893,Innocent,Victim
+EN_UA_014829.txt,Vladimir Putin,2207,2220,Innocent,Scapegoat
+EN_UA_014829.txt,Sweden,2938,2943,Antagonist,Deceiver
+EN_UA_014829.txt,US administration,3734,3750,Antagonist,Conspirator
+EN_UA_014829.txt,President Joe Biden,3756,3774,Antagonist,Conspirator
+EN_CC_100038.txt,the Fed,608,614,Antagonist,Tyrant
+EN_CC_100038.txt,the Fed,1081,1087,Antagonist,Incompetent
+EN_UA_300038.txt,OLEKSANDR USYK,118,131,Protagonist,Martyr
+EN_UA_300038.txt,Russia,420,425,Antagonist,Instigator
+EN_UA_300038.txt,Vladimir Putin,751,764,Antagonist,Instigator
+EN_UA_DEV_216.txt,Europe,305,310,Antagonist,Incompetent
+EN_UA_DEV_216.txt,EU,501,502,Antagonist,Incompetent
+EN_UA_DEV_216.txt,Hungary,573,579,Protagonist,Underdog
+EN_UA_DEV_216.txt,Europe's,1823,1830,Innocent,Exploited
+EN_UA_DEV_216.txt,the U.S,1845,1851,Antagonist,Tyrant
+EN_CC_200227.txt,COP28,170,174,Antagonist,Corrupt
+EN_CC_200227.txt,Guardian,1838,1845,Protagonist,Rebel
+EN_CC_200227.txt,Mr Al Jaber,1881,1891,Antagonist,Corrupt
+EN_UA_300079.txt,Zelensky,452,459,Antagonist,Tyrant
+EN_UA_300079.txt,Germany,709,715,Antagonist,Tyrant
+EN_UA_300079.txt,United States,840,852,Antagonist,Tyrant
+EN_UA_300079.txt,Joe Biden,860,868,Antagonist,Tyrant
+EN_CC_200048.txt,JBS,261,263,Antagonist,Deceiver,Corrupt
+EN_CC_200048.txt,Letitia James,1339,1351,Antagonist,Bigot
+EN_UA_008586.txt,Washington,949,958,Antagonist,Tyrant
+EN_UA_008586.txt,Brussels,964,971,Antagonist,Tyrant
+EN_UA_008586.txt,US,2207,2208,Antagonist,Tyrant
+EN_UA_025165.txt,US politicians,100,113,Antagonist,Traitor
+EN_UA_025165.txt,Kiev,1592,1595,Protagonist,Underdog
+EN_UA_025165.txt,the West,2668,2675,Antagonist,Instigator,Foreign Adversary
+EN_CC_100095.txt,Greta Thunberg,269,282,Antagonist,Instigator
+EN_CC_100095.txt,Irma Kjellström,1297,1311,Protagonist,Rebel
+EN_CC_100095.txt,Greta Thunberg,1691,1704,Antagonist,Deceiver
+EN_UA_014014.txt,Lula,644,647,Protagonist,Rebel
+EN_UA_014014.txt,IMF,2372,2374,Antagonist,Tyrant
+EN_UA_014014.txt,Argentina,2394,2402,Innocent,Exploited
+EN_UA_014014.txt,Brazil,2430,2435,Innocent,Exploited
+EN_UA_023008.txt,Davos/UK dominated media,372,395,Antagonist,Deceiver
+EN_UA_023008.txt,Carlson,2801,2807,Innocent,Scapegoat
+EN_UA_023008.txt,Hillary Clinton,2822,2836,Antagonist,Deceiver
+EN_UA_300012.txt,Kremlin's,172,180,Antagonist,Tyrant
+EN_UA_300012.txt,Ruslan Zinin,358,369,Protagonist,Rebel
+EN_UA_008072.txt,Putin,2431,2435,Antagonist,Incompetent
+EN_UA_300127.txt,China,614,618,Antagonist,Foreign Adversary
+EN_UA_300127.txt,Russia,624,629,Antagonist,Foreign Adversary
+EN_UA_021123.txt,United States,558,570,Protagonist,Martyr
+EN_UA_021123.txt,Russian,2562,2568,Antagonist,Saboteur
+EN_UA_300010.txt,Marjorie Taylor Greene,97,118,Protagonist,Guardian
+EN_UA_300010.txt,Hunter Biden,204,215,Antagonist,Corrupt
+EN_UA_013257.txt,Russia,375,380,Protagonist,Underdog
+EN_UA_013257.txt,Russia,944,949,Innocent,Victim
+EN_UA_013257.txt,Russia,1590,1595,Protagonist,Guardian
+EN_UA_013257.txt,Western countries,1667,1683,Antagonist,Saboteur
+EN_UA_013257.txt,Russia,1763,1768,Protagonist,Virtuous
+PT_168.txt,Climáximo,281,289,Protagonist,Rebel
+PT_168.txt,Navigator,349,357,Antagonist,Corrupt
+PT_168.txt,Alice Gato,965,974,Protagonist,Rebel
+PT_168.txt,Estado,1149,1154,Antagonist,Corrupt
+PT_168.txt,Governos,1578,1585,Antagonist,Corrupt
+PT_168.txt,Navigator,1609,1617,Antagonist,Corrupt
+PT_184.txt,Rio Grande do Sul,167,183,Innocent,Victim
+PT_184.txt,Rio Grande do Sul,502,518,Innocent,Victim
+PT_199.txt,Fleischmann,1538,1548,Protagonist,Guardian
+PT_92.txt,Serguei Riabkov,158,172,Protagonist,Guardian
+PT_92.txt,Estados Unidos da América,261,285,Antagonist,Foreign Adversary
+PT_75.txt,Kiev,827,830,Innocent,Victim
+PT_75.txt,Moscovo,1011,1017,Antagonist,Foreign Adversary
+PT_273.txt,Rússia,456,461,Innocent,Victim
+PT_273.txt,Ucrânia,853,859,Antagonist,Incompetent
+PT_12.txt,Ocidente,298,305,Antagonist,Conspirator,Instigator
+PT_12.txt,Zelensky,1307,1314,Antagonist,Incompetent
+PT_12.txt,Aleksandr Syrsky,1374,1389,Antagonist,Incompetent
+PT_12.txt,Washington,2062,2071,Antagonist,Conspirator
+PT_12.txt,Serviço de Segurança da Ucrânia,2207,2237,Antagonist,Conspirator
+PT_12.txt,Azov,2297,2300,Antagonist,Conspirator,Terrorist
+PT_12.txt,Aidar,2304,2308,Antagonist,Conspirator,Terrorist
+PT_12.txt,Kiev,2684,2687,Antagonist,Foreign Adversary
+PT_12.txt,Londres,2738,2744,Antagonist,Foreign Adversary
+PT_12.txt,Washington,2748,2757,Antagonist,Foreign Adversary
+PT_12.txt,EUA,2994,2996,Antagonist,Foreign Adversary
+PT_131.txt,Volodymyr Zelensky,114,131,Antagonist,Foreign Adversary
+PT_131.txt,Dmitry Peskov,264,276,Protagonist,Peacemaker
+PT_131.txt,Rússia,1133,1138,Protagonist,Peacemaker
+PT_296.txt,Zelensky,126,133,Protagonist,Peacemaker
+PT_296.txt,Kiev,1067,1070,Antagonist,Instigator,Foreign Adversary
+PT_93.txt,Dmitri Peskov,355,367,Protagonist,Guardian
+PT_93.txt,Moscovo,417,423,Protagonist,Guardian
+PT_93.txt,NATO,542,545,Antagonist,Foreign Adversary
+PT_93.txt,Zelensky,1781,1788,Antagonist,Instigator
+PT_379.txt,Comissão de Investigação,182,205,Protagonist,Guardian
+PT_379.txt,A. Khmara,310,318,Antagonist,Terrorist
+PT_379.txt,E. Ermolenko,530,541,Antagonist,Terrorist
+PT_379.txt,D. Pavlovsky,600,611,Antagonist,Terrorist
+PT_379.txt,E. Petrov,615,623,Antagonist,Terrorist
+PT_379.txt,S. K. Mikael,837,848,Antagonist,Terrorist
+PT_379.txt,Azov,1004,1007,Antagonist,Terrorist
+PT_379.txt,D. K. F. Patrick,1238,1253,Antagonist,Terrorist
+PT_379.txt,R. Burduli,1257,1266,Antagonist,Terrorist
+PT_379.txt,G. Kinoiani,1344,1354,Antagonist,Terrorist
+PT_379.txt,Forças Armadas Ucranianas,1609,1633,Antagonist,Corrupt
+PT_370.txt,EUA,1543,1545,Antagonist,Corrupt
+PT_127.txt,Mykhailo Podolyak,111,127,Protagonist,Virtuous
+PT_127.txt,Kyiv,318,321,Protagonist,Virtuous
+PT_127.txt,Volodymyr Zelensky,356,373,Protagonist,Virtuous,Guardian
+PT_127.txt,Comissão Europeia,466,482,Protagonist,Peacemaker
+PT_127.txt,Zoltan Kovacs,709,721,Protagonist,Guardian
+PT_127.txt,Ucrânia,750,756,Antagonist,Instigator
+PT_127.txt,Hungria,905,911,Innocent,Victim
+PT_127.txt,Eslováquia,917,926,Innocent,Victim
+PT_127.txt,Ucrânia,1058,1064,Antagonist,Tyrant
+PT_127.txt,Viktor Orbán,1604,1615,Protagonist,Peacemaker
+PT_127.txt,Robert Fico,1645,1655,Protagonist,Peacemaker
+PT_135.txt,Estados Unidos,802,815,Innocent,Victim
+PT_135.txt,Europa Ocidental,821,836,Innocent,Victim
+PT_135.txt,Rússia,883,888,Innocent,Victim
+PT_283.txt,Kiev,77,80,Antagonist,Instigator,Foreign Adversary
+PT_283.txt,Kremlin,146,152,Protagonist,Guardian
+PT_283.txt,Rússia,277,282,Protagonist,Guardian
+PT_283.txt,Rosatom,1286,1292,Protagonist,Guardian
+PT_283.txt,Moscovo,1399,1405,Protagonist,Guardian
+PT_283.txt,Kremlin,2041,2047,Antagonist,Deceiver
+PT_283.txt,Kiev,2132,2135,Innocent,Scapegoat
+PT_283.txt,Putin,2173,2177,Antagonist,Saboteur
+PT_283.txt,Rússia,2238,2243,Antagonist,Foreign Adversary
+PT_112.txt,Vladimir Putin,185,198,Protagonist,Guardian
+PT_112.txt,Estados Unidos,264,277,Antagonist,Instigator
+PT_112.txt,Serguei Riabkov,392,406,Protagonist,Guardian
+PT_112.txt,NATO,512,515,Antagonist,Foreign Adversary
+PT_112.txt,Kremlin,2088,2094,Protagonist,Guardian
+PT_112.txt,União Europeia,2128,2141,Antagonist,Foreign Adversary
+PT_112.txt,Rússia,2281,2286,Innocent,Victim
+PT_112.txt,Orbán,3937,3941,Antagonist,Traitor
+PT_247.txt,Donald Trump,249,260,Protagonist,Peacemaker
+PT_247.txt,Michel,2144,2149,Protagonist,Guardian
+PT_247.txt,Rússia,2310,2315,Antagonist,Foreign Adversary
+PT_247.txt,Ucrânia,2334,2340,Innocent,Victim
+PT_247.txt,Ursula von der Leyen,2779,2798,Protagonist,Virtuous
+PT_86.txt,Organização Mundial de Saúde,328,355,Protagonist,Guardian
+PT_77.txt,Presidente Zelensky,1430,1448,Antagonist,Instigator
+PT_77.txt,António Tânger,1609,1622,Antagonist,Incompetent
+PT_276.txt,Rússia,76,81,Protagonist,Guardian
+PT_276.txt,Forças Armadas,642,655,Protagonist,Guardian
+PT_276.txt,Legião Liberdade da Rússia,1458,1483,Antagonist,Terrorist
+PT_276.txt,Corpo de Voluntários Russos,1494,1520,Antagonist,Terrorist
+PT_126.txt,Evgeny Serebriakov,289,306,Antagonist,Conspirator,Terrorist
+PT_126.txt,Iliá,938,941,Antagonist,Conspirator,Terrorist
+PT_361.txt,Kiev,367,370,Antagonist,Incompetent
+PT_35.txt,Rússia,1536,1541,Protagonist,Guardian
+PT_35.txt,NATO,1587,1590,Antagonist,Foreign Adversary
+PT_35.txt,Sergei Lavrov,1685,1697,Protagonist,Guardian
+PT_35.txt,Vladimir Putin,1918,1931,Protagonist,Guardian
+PT_35.txt,Kiev,2019,2022,Antagonist,Tyrant
+PT_227.txt,Ucrânia,165,171,Antagonist,Foreign Adversary
+PT_227.txt,Kiev,459,462,Antagonist,Foreign Adversary
+PT_227.txt,Ocidente,632,639,Antagonist,Instigator
+PT_227.txt,Ministério da Defesa,1344,1363,Protagonist,Guardian
+PT_227.txt,Kiev,1456,1459,Antagonist,Instigator
+PT_133.txt,Zelensky,117,124,Antagonist,Saboteur,Instigator
+PT_133.txt,Kyiv,224,227,Antagonist,Incompetent
+PT_133.txt,Andrei Nastasin,322,336,Protagonist,Virtuous
+PT_133.txt,Kiev,548,551,Antagonist,Corrupt,Tyrant
+PT_133.txt,Ocidente,602,609,Antagonist,Conspirator
+PT_133.txt,Rússia,725,730,Protagonist,Underdog
+PT_133.txt,Hungria,1080,1086,Protagonist,Rebel
+PT_133.txt,Eslováquia,1090,1099,Protagonist,Rebel
+PT_133.txt,Kiev,1274,1277,Antagonist,Instigator
+PT_133.txt,Péter Szijjártó,1470,1484,Protagonist,Virtuous
+PT_133.txt,Comissão Europeia,1511,1527,Antagonist,Conspirator,Tyrant
+PT_133.txt,União Europeia,1776,1789,Antagonist,Traitor
+PT_133.txt,Budapeste,1836,1844,Innocent,Forgotten
+PT_133.txt,Bratislava,1848,1857,Innocent,Forgotten
+PT_133.txt,Estados-membros da UE,1983,2003,Innocent,Forgotten
+PT_133.txt,Bruxelas,2009,2016,Antagonist,Saboteur
+PT_133.txt,Comissão Europeia,2085,2101,Antagonist,Incompetent,Traitor
+PT_133.txt,Bruxelas,2195,2202,Antagonist,Conspirator
+PT_255.txt,Vladimir Putin,1016,1029,Protagonist,Guardian
+PT_255.txt,Volodimir Zelenski,1066,1083,Antagonist,Bigot
+PT_382.txt,NATO,118,121,Antagonist,Foreign Adversary
+PT_382.txt,Rússia,297,302,Innocent,Victim
+PT_382.txt,EUA,1531,1533,Antagonist,Instigator
+PT_64.txt,Kyiv,310,313,Protagonist,Virtuous
+PT_64.txt,Procuradoria-Geral da Ucrânia,1487,1515,Protagonist,Guardian
+PT_64.txt,Ucrânia,1638,1644,Innocent,Victim
+PT_64.txt,Zaporijia,1813,1821,Innocent,Victim
+PT_64.txt,Rússia,2387,2392,Protagonist,Rebel
+PT_352..txt,Toretsk,125,131,Innocent,Victim
+PT_352..txt,República Popular de Donetsk,224,251,Innocent,Victim
+PT_352..txt,Exército ucraniano,1407,1424,Antagonist,Foreign Adversary
+PT_125.txt,Moscovo,1141,1147,Protagonist,Rebel
+PT_125.txt,Rússia,1203,1208,Protagonist,Guardian
+PT_262.txt,Forças Armadas ucranianas,110,134,Antagonist,Terrorist
+PT_262.txt,Vladimir Pipko,330,343,Antagonist,Terrorist
+PT_262.txt,Emil Ishkulov,347,359,Antagonist,Terrorist
+PT_02.txt,EUA,152,154,Antagonist,Foreign Adversary,Deceiver
+PT_02.txt,Washington,216,225,Antagonist,Foreign Adversary
+PT_02.txt,Ucrânia,252,258,Antagonist,Foreign Adversary
+PT_02.txt,EUA,736,738,Antagonist,Conspirator
+PT_02.txt,Washington,1013,1022,Antagonist,Deceiver
+PT_09.txt,Ocidente,140,147,Antagonist,Foreign Adversary
+PT_09.txt,Rússia,158,163,Innocent,Victim
+PT_09.txt,NATO,306,309,Antagonist,Foreign Adversary
+PT_09.txt,Kiev,611,614,Antagonist,Foreign Adversary
+PT_102.txt,Irina Farion,239,250,Innocent,Victim
+PT_102.txt,Vyacheslav Zinchenko,644,663,Antagonist,Terrorist
+PT_269.txt,Kiev,280,283,Antagonist,Instigator
+PT_269.txt,Putin,1303,1307,Protagonist,Guardian
+PT_65.txt,Rússia,1064,1069,Protagonist,Guardian
+PT_65.txt,Ucrânia,1081,1087,Antagonist,Foreign Adversary
+PT_124.txt,Kuleba,296,301,Protagonist,Virtuous
+PT_124.txt,Rússia,377,382,Antagonist,Foreign Adversary,Deceiver
+PT_124.txt,Kiev,500,503,Protagonist,Virtuous
+PT_124.txt,Rússia,540,545,Antagonist,Deceiver
+PT_124.txt,Ucrânia,1712,1718,Protagonist,Peacemaker
+PT_124.txt,Rússia,1760,1765,Antagonist,Foreign Adversary
+PT_124.txt,Rússia,2148,2153,Protagonist,Peacemaker
+PT_124.txt,Volodymyr Zelensky,2231,2248,Antagonist,Foreign Adversary,Tyrant
+PT_392.txt,Lula,727,730,Protagonist,Guardian
+PT_392.txt,Lula,1384,1387,Protagonist,Virtuous
+PT_271.txt,Joe Biden,292,300,Antagonist,Incompetent
+PT_271.txt,Biden,1422,1426,Antagonist,Instigator
+PT_166.txt,José Manuel Fernandes,708,728,Protagonist,Virtuous
+PT_395.txt,Luis Montenegro,1180,1194,Antagonist,Corrupt
+PT_395.txt,Montenegro,1619,1628,Antagonist,Incompetent
+PT_266.txt,Vladimir Putin,230,243,Protagonist,Virtuous
+PT_266.txt,Washington,600,609,Antagonist,Bigot
+PT_266.txt,NATO,616,619,Antagonist,Bigot
+PT_266.txt,Portugal,622,629,Antagonist,Bigot
+PT_266.txt,UE,650,651,Antagonist,Bigot
+PT_266.txt,Kursk,942,946,Innocent,Victim
+PT_266.txt,Ucrânia,963,969,Antagonist,Saboteur
+PT_266.txt,Lisboa,1211,1216,Antagonist,Instigator
+PT_345.txt,Zelensky,963,970,Antagonist,Instigator
+PT_345.txt,NATO,999,1002,Antagonist,Conspirator
+PT_345.txt,EUA,1222,1224,Antagonist,Saboteur
+PT_345.txt,Kiev,1527,1530,Antagonist,Deceiver
+PT_345.txt,Moscovo,1801,1807,Innocent,Victim
+PT_388.txt,António Costa,1164,1176,Antagonist,Incompetent
+PT_388.txt,Governo,1839,1845,Antagonist,Incompetent
+PT_10.txt,Gitanas Nauseda,121,135,Protagonist,Guardian
+PT_10.txt,Ucrânia,181,187,Innocent,Victim
+PT_10.txt,Kiev,284,287,Innocent,Victim
+PT_10.txt,Emmanuel Macron,434,448,Protagonist,Guardian
+PT_10.txt,Vladimir Putin,1316,1329,Antagonist,Foreign Adversary
+PT_10.txt,Kiev,2018,2021,Antagonist,Foreign Adversary
+PT_10.txt,Presidente Vladimir Putin,2120,2144,Protagonist,Guardian
+PT_10.txt,Ocidente,2159,2166,Antagonist,Foreign Adversary
+PT_251.txt,Ucrânia,134,140,Protagonist,Peacemaker
+PT_251.txt,Rússia,211,216,Protagonist,Peacemaker
+PT_251.txt,Dmytro Kuleba,367,379,Protagonist,Peacemaker
+PT_251.txt,Dmitry Peskov,776,788,Protagonist,Peacemaker
+PT_251.txt,Putin,1659,1663,Protagonist,Peacemaker
+PT_251.txt,China,2140,2144,Antagonist,Deceiver
+PT_193.txt,Greta Thunberg,808,821,Protagonist,Rebel
+PT_193.txt,Alok Sharma,1235,1245,Protagonist,Virtuous
+PT_193.txt,Txai Suruí,1443,1452,Protagonist,Rebel,Virtuous
+PT_193.txt,Ari Uru-Eu-Wau-Wau,1694,1711,Protagonist,Martyr
+PT_366.txt,Vladimir Zelensky,114,130,Antagonist,Incompetent
+PT_366.txt,NATO,183,186,Antagonist,Foreign Adversary
+PT_366.txt,Rússia,218,223,Innocent,Victim
+PT_366.txt,Zelensky,730,737,Antagonist,Instigator
+PT_366.txt,Kiev,1364,1367,Antagonist,Terrorist
+PT_366.txt,Kiev,1864,1867,Antagonist,Tyrant
+PT_366.txt,Moscovo,2061,2067,Innocent,Victim

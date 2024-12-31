@@ -1,7 +1,7 @@
 import csv
 
 # Read the input text file
-input_file = "/home/mohamed/repos/nlp_proj/EN/subtask-1-annotations.txt"
+input_file = "/home/mohamed/repos/nlp_proj/PT/subtask-1-annotations.txt"
 output_file = "output.csv"
 
 with open(input_file, 'r') as infile, open(output_file, 'w', newline='') as outfile:
