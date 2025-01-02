@@ -6,14 +6,9 @@ import os
 from typing import List, Tuple, Dict
 from tqdm import tqdm
 import numpy as np
-<<<<<<< Updated upstream
-from torch.optim.lr_scheduler import ReduceLROnPlateau # 
-from sklearn.metrics import confusion_matrix, classification_report # test
-=======
 from torch.optim.lr_scheduler import ReduceLROnPlateau 
 from sklearn.metrics import confusion_matrix, classification_report
 from llama_dataset import EntityDataset
->>>>>>> Stashed changes
 
 from dotenv import load_dotenv 
 TXT_FILE_PATH = '/home/mohamed/repos/nlp_proj/EN/raw-documents'
