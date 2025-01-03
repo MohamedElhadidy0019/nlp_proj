@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 from transformers import LlamaModel, LlamaTokenizer, AutoTokenizer
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset, RandomSampler, Subset
+import random
 import os
 from typing import List, Tuple, Dict
 from tqdm import tqdm
@@ -9,86 +10,23 @@ import numpy as np
 from torch.optim.lr_scheduler import ReduceLROnPlateau 
 from sklearn.metrics import confusion_matrix, classification_report
 from llama_dataset import EntityDataset
+from llama_model import EntityClassifier
+from copy import deepcopy
 
 from dotenv import load_dotenv 
 TXT_FILE_PATH = '/home/mohamed/repos/nlp_proj/EN/raw-documents'
 load_dotenv()
 ACCESS_TOKEN = os.getenv("HUGGING_TOKEN")
 
-class EntityClassifier(nn.Module):
-    def __init__(self, freeze_base=True):
-        super().__init__()
-        self.main_classes = ['Antagonist', 'Protagonist', 'Innocent']
-        self.subclasses = {
+def train_model(train_file: str, val_file:str, article_txt_path: str, epochs: int = 100, batch_size: int = 1, learning_rate: float = 5e-5):
+    main_classes = ['Antagonist', 'Protagonist', 'Innocent']
+    subclasses = {
             'Antagonist': ['Instigator', 'Conspirator', 'Tyrant', 'Foreign Adversary', 
                           'Traitor', 'Spy', 'Saboteur', 'Corrupt', 'Incompetent', 
                           'Terrorist', 'Deceiver', 'Bigot'],
             'Protagonist': ['Guardian', 'Martyr', 'Peacemaker', 'Rebel', 'Underdog', 'Virtuous'],
             'Innocent': ['Forgotten', 'Exploited', 'Victim', 'Scapegoat']
         }
-        
-        # Initialize Llama-2
-        self.llama = LlamaModel.from_pretrained("meta-llama/Llama-3.2-1B", token=ACCESS_TOKEN)
-        if freeze_base:
-            for param in self.llama.parameters():
-                param.requires_grad = False
-        
-        # Classification heads
-        hidden_size = 2048  # Llama-2 3.2B hidden size
-        
-        self.main_classifier = nn.Sequential(
-            nn.Linear(hidden_size, 1024),
-            nn.LayerNorm(1024),
-            nn.GELU(),
-            nn.Dropout(0.1),
-            nn.Linear(1024, 512),
-            nn.LayerNorm(512),
-            nn.GELU(),
-            nn.Dropout(0.1),
-            nn.Linear(512, len(self.main_classes))
-        )
-        
-        self.subclass_classifiers = nn.ModuleDict({
-            main_class: nn.Sequential(
-                nn.Linear(hidden_size, 1024),
-                nn.LayerNorm(1024),
-                nn.GELU(),
-                nn.Dropout(0.1),
-                nn.Linear(1024, 512),
-                nn.LayerNorm(512),
-                nn.GELU(),
-                nn.Dropout(0.1),
-                nn.Linear(512, len(subclasses))
-            )
-            for main_class, subclasses in self.subclasses.items()
-        })
-
-    def forward(self, input_ids, attention_mask, entity_start_pos, entity_end_pos):
-        # Get Llama outputs
-        outputs = self.llama(input_ids=input_ids, attention_mask=attention_mask)
-        hidden_states = outputs.last_hidden_state
-        
-        # Extract entity representations
-        batch_size = hidden_states.size(0)
-        entity_reprs = []
-        
-        for i in range(batch_size):
-            start = entity_start_pos[i]
-            end = entity_end_pos[i]
-            entity_repr = hidden_states[i, start:end+1].mean(dim=0)
-            entity_reprs.append(entity_repr)
-        
-        entity_reprs = torch.stack(entity_reprs)
-        
-        # Get predictions
-        main_class_logits = self.main_classifier(entity_reprs)
-        subclass_logits = {
-            main_class: classifier(entity_reprs)
-            for main_class, classifier in self.subclass_classifiers.items()
-        }
-        
-        return main_class_logits, subclass_logits
-def train_model(data_file: str, epochs: int = 100, batch_size: int = 1, learning_rate: float = 5e-5):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # device = torch.device("cpu")
     print(f"Using device: {device}")
@@ -97,14 +35,18 @@ def train_model(data_file: str, epochs: int = 100, batch_size: int = 1, learning
     tokenizer =  AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B", token=ACCESS_TOKEN)
     tokenizer.pad_token = tokenizer.eos_token
     
-    dataset = EntityDataset(data_file, tokenizer)
-    
-    val_size = int(0.2 * len(dataset))
-    train_size = len(dataset) - val_size
-    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+    # train_dataset = EntityDataset(train_file, tokenizer, article_txt_path)
+    val_dataset = EntityDataset(val_file, tokenizer, article_txt_path)
+    train_dataset = deepcopy(val_dataset)
+    val_subset_indices = random.sample(range(len(val_dataset)), int(0.1 * len(val_dataset)))
+    val_dataset = Subset(val_dataset, val_subset_indices)
+    print(f'len of train = {len(train_dataset)}')
+    print(f'len of val = {len(val_dataset)}')
 
+    # shuffle both of them
+    
     def collate_fn(batch):
-        max_len = 4096  # Fixed maximum length for Llama-2
+        max_len = 2048  # Fixed maximum length for Llama-3.2 1B
         
         input_ids_batch = []
         attention_mask_batch = []
@@ -156,96 +98,59 @@ def train_model(data_file: str, epochs: int = 100, batch_size: int = 1, learning
     model = EntityClassifier(freeze_base=True).to(device)
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=0.01)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3)
-    criterion = nn.CrossEntropyLoss()
     max_grad_norm = 1.0
 
-    # Initialize best metrics for model saving
-    best_val_loss = float('inf')
-    best_val_accuracy = 0.0
-    
-    def compute_subclass_labels(batch_subclasses, main_class, subclass_list):
-        """Helper function to create one-hot encoded subclass labels"""
-        labels = torch.zeros(len(batch_subclasses), len(subclass_list))
-        for i, subclasses in enumerate(batch_subclasses):
-            for subclass in subclasses:
-                if subclass in subclass_list:
-                    labels[i, subclass_list.index(subclass)] = 1
-        return labels
 
-    def evaluate_model(model, data_loader, device, dataset):
-        model.eval()
-        total_loss = 0
-        main_correct = 0
-        subclass_correct = {cls: 0 for cls in model.main_classes}
-        subclass_total = {cls: 0 for cls in model.main_classes}
-        all_main_preds = []
-        all_main_labels = []
-        
-        with torch.no_grad():
-            for batch in data_loader:
-                input_ids = batch['input_ids'].to(device)
-                attention_mask = batch['attention_mask'].to(device)
-                entity_start_pos = batch['entity_start_pos'].to(device)
-                entity_end_pos = batch['entity_end_pos'].to(device)
-                
-                main_class_logits, subclass_logits = model(
-                    input_ids, attention_mask, entity_start_pos, entity_end_pos
-                )
-                
-                # Main class evaluation
-                main_labels = torch.tensor([
-                    dataset.main_classes.index(mc) for mc in batch['main_class']
-                ]).to(device)
-                
-                main_preds = torch.argmax(main_class_logits, dim=1)
-                main_correct += (main_preds == main_labels).sum().item()
-                
-                all_main_preds.extend(main_preds.cpu().numpy())
-                all_main_labels.extend(main_labels.cpu().numpy())
-                
-                # Subclass evaluation for each main class
-                for main_class, subclass_list in model.subclasses.items():
-                    mask = torch.tensor([mc == main_class for mc in batch['main_class']]).to(device)
-                    if mask.sum() > 0:
-                        subclass_labels = compute_subclass_labels(
-                            [sc for i, sc in enumerate(batch['subclasses']) if batch['main_class'][i] == main_class],
-                            main_class,
-                            subclass_list
-                        ).to(device)
-                        
-                        subclass_preds = (torch.sigmoid(subclass_logits[main_class][mask]) > 0.5).float()
-                        correct = (subclass_preds == subclass_labels[mask]).sum().item()
-                        total = mask.sum().item() * len(subclass_list)
-                        
-                        subclass_correct[main_class] += correct
-                        subclass_total[main_class] += total
 
-        # Calculate metrics
-        main_accuracy = main_correct / len(data_loader.dataset)
-        subclass_accuracies = {
-            cls: subclass_correct[cls] / max(subclass_total[cls], 1)
-            for cls in model.main_classes
+    def compute_loss(main_class_logits, antagonist_logits, protagonist_logits, innocent_logits, batch):
+        # Map main class and subclasses to indices
+        main_class_to_idx = {cls: i for i, cls in enumerate(main_classes)}
+        subclass_to_idx = {
+            cls: {subcls: i for i, subcls in enumerate(subclasses)}
+            for cls, subclasses in subclasses.items()
         }
-        
-        # Print detailed classification report for main classes
-        print("\nMain Class Classification Report:")
-        print(classification_report(
-            all_main_labels, 
-            all_main_preds, 
-            target_names=dataset.main_classes
-        ))
-        
-        # Print subclass accuracies
-        print("\nSubclass Accuracies:")
-        for cls, acc in subclass_accuracies.items():
-            print(f"{cls}: {acc:.4f}")
-            
-        return main_accuracy, subclass_accuracies
 
-    # Initial evaluation
-    # print("\nInitial Evaluation:")
-    # main_accuracy, subclass_accuracies = evaluate_model(model, val_loader, device, dataset)
-    # print(f"Initial Main Class Accuracy: {main_accuracy:.4f}")
+        # Prepare ground truth labels
+        main_class_labels = torch.tensor([main_class_to_idx[cls] for cls in batch['main_class']], dtype=torch.long)
+        batch_size = len(batch['main_class'])
+        subclass_labels = torch.zeros((batch_size, max(len(subcls) for subcls in subclasses.values())), dtype=torch.float)
+
+        for i, (main_cls, subs) in enumerate(zip(batch['main_class'], batch['subclasses'])):
+            for sub in subs:
+                subclass_labels[i, subclass_to_idx[main_cls][sub]] = 1# here we get the gnd truth subclass labels
+
+        # Select subclass logits, we get the labels of the the subclass of the right gnd truth main class
+        # so what we do here is
+        # the max len of subclasses is 12, so we create a tensor of zeros with the same shape as the subclass_labels
+        # then we fill the tensor with the logits of the right subclass
+        # and compare it with the subclass_labels of the gnd truth main class
+        # so if the main class is misclassified
+        # the subclass will be compared with the right subclass as we knot it from gnd truth
+        subclass_logits = torch.zeros_like(subclass_labels)
+        for i, main_pred in enumerate(main_class_labels):
+            if main_pred == 0:  # Antagonist
+                subclass_logits[i][:len(antagonist_logits[i])] = antagonist_logits[i]
+            elif main_pred == 1:  # Protagonist
+                subclass_logits[i][:len(protagonist_logits[i])] = protagonist_logits[i]
+
+            elif main_pred == 2:  # Innocent
+                # subclass_logits[i] = innocent_logits[i]
+                subclass_logits[i][:len(innocent_logits[i])] = innocent_logits[i]
+
+
+        # Compute losses
+        criterion_main= nn.CrossEntropyLoss()
+        criterion_sub = nn.BCEWithLogitsLoss()
+        # all logitcs to device
+        main_class_logits = main_class_logits.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+        subclass_logits = subclass_logits.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+        main_class_labels = main_class_labels.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+        subclass_labels = subclass_labels.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
+
+        main_loss = criterion_main(main_class_logits, main_class_labels)
+        subclass_loss = criterion_sub(subclass_logits, subclass_labels)
+
+        return main_loss, subclass_loss
     
     for epoch in range(epochs):
         model.train()
@@ -262,35 +167,12 @@ def train_model(data_file: str, epochs: int = 100, batch_size: int = 1, learning
                 entity_start_pos = batch['entity_start_pos'].to(device)
                 entity_end_pos = batch['entity_end_pos'].to(device)
                 
-                main_class_logits, subclass_logits = model(
+                main_class_logits, antagonist_logits, protagonist_logits, innocent_logits = model(
                     input_ids, attention_mask, entity_start_pos, entity_end_pos
                 )
+                main_loss, subclass_loss = compute_loss(main_class_logits, antagonist_logits, protagonist_logits, innocent_logits, batch)
+                loss = main_loss + subclass_loss
                 
-                # Main class loss
-                main_labels = torch.tensor([
-                    dataset.main_classes.index(mc) for mc in batch['main_class']
-                ]).to(device)
-                main_loss = criterion(main_class_logits, main_labels)
-                
-                # # Subclass losses
-                # subclass_loss = 0
-                # for main_class, subclass_list in model.subclasses.items():
-                #     mask = torch.tensor([mc == main_class for mc in batch['main_class']]).to(device)
-                #     if mask.sum() > 0:
-                #         subclass_labels = compute_subclass_labels(
-                #             [sc for i, sc in enumerate(batch['subclasses']) if batch['main_class'][i] == main_class],
-                #             main_class,
-                #             subclass_list
-                #         ).to(device)
-                        
-                #         subclass_loss += nn.BCEWithLogitsLoss()(
-                #             subclass_logits[main_class][mask],
-                #             subclass_labels[mask]
-                #         )
-                
-                # Combined loss
-                # loss = main_loss + 0.5 * subclass_loss  # Weight factor for subclass loss
-                loss = main_loss
                 
                 if torch.isnan(loss):
                     print("NaN loss detected, skipping batch")
@@ -303,12 +185,13 @@ def train_model(data_file: str, epochs: int = 100, batch_size: int = 1, learning
                 train_loss += loss.item()
                 pbar.set_postfix({
                     'loss': f"{loss.item():.4f}",
-                    'main_loss': f"{main_loss.item():.4f}"
-                    # 'subclass_loss': f"{subclass_loss.item():.4f}"
+                    'main_loss': f"{main_loss.item():.4f}",
+                    'subclass_loss': f"{subclass_loss.item():.4f}"
                 })
                 
             except Exception as e:
                 print(f"Error in batch: {str(e)}")
+                raise e
                 continue
         
         avg_loss = train_loss / len(train_loader)
@@ -317,19 +200,19 @@ def train_model(data_file: str, epochs: int = 100, batch_size: int = 1, learning
         # Evaluation phase
         print(f"\nEpoch {epoch+1}/{epochs}")
         print(f"Average Training Loss: {avg_loss:.4f}")
-        main_accuracy, subclass_accuracies = evaluate_model(model, val_loader, device, dataset)
+        # main_accuracy, subclass_accuracies = evaluate_model(model, val_loader, device, dataset)
         
-        # Save best model
-        if main_accuracy > best_val_accuracy:
-            best_val_accuracy = main_accuracy
-            torch.save({
-                'epoch': epoch,
-                'model_state_dict': model.state_dict(),
-                'optimizer_state_dict': optimizer.state_dict(),
-                'main_accuracy': main_accuracy,
-                'subclass_accuracies': subclass_accuracies
-            }, 'best_model.pth')
-            print("Saved new best model!")
+        # # Save best model
+        # if main_accuracy > best_val_accuracy:
+        #     best_val_accuracy = main_accuracy
+        #     torch.save({
+        #         'epoch': epoch,
+        #         'model_state_dict': model.state_dict(),
+        #         'optimizer_state_dict': optimizer.state_dict(),
+        #         'main_accuracy': main_accuracy,
+        #         'subclass_accuracies': subclass_accuracies
+        #     }, 'best_model.pth')
+        #     print("Saved new best model!")
 
         print(f"Current learning rate: {optimizer.param_groups[0]['lr']}")
         print("-" * 50)
@@ -338,6 +221,9 @@ def train_model(data_file: str, epochs: int = 100, batch_size: int = 1, learning
 
 def main():
     data_file = "/home/mohamed/repos/nlp_proj/output.csv"
-    train_model(data_file)
+    train_file = '/home/mohamed/repos/nlp_proj/split/train.csv'
+    val_file = '/home/mohamed/repos/nlp_proj/split/val.csv'
+    article_txt_path = '/home/mohamed/repos/nlp_proj/split/EN+PT_txt_files'
+    train_model(train_file, val_file, article_txt_path)
 if __name__ == '__main__':
     main()
