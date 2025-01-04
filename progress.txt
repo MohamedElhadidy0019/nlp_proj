@@ -1,0 +1,5 @@
+- tried gpt2 with a mlp classifier at the end, bu just taking the embedding of the token of the entity, and feeding it 
+    to the mlp, the progress was not that good so began to try a new llama
+- tried llama 3.2 1B because it can take the whole token length sequence, it also reached better perfomrance but not that good
+- will try llama3.2 but this time with taingng the last decoder layer, instead of freezing all the llama model
+- made train,val,test where the txt file of an article is only in train or val or test, to prevent data leakage

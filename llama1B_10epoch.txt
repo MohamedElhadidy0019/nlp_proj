@@ -1,0 +1,282 @@
+Processing files: 100%|████████████████████████████████████████████████| 686/686 [00:08<00:00, 81.92it/s]
+Loaded 686 valid examples
+Epoch 1/100: 100%|██████████████████████| 549/549 [43:18<00:00,  4.73s/it, loss=0.0021, main_loss=0.0021]
+
+Epoch 1/100
+Average Training Loss: 1.2573
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.78      0.99      0.87       102
+ Protagonist       0.50      0.14      0.22        21
+    Innocent       1.00      0.07      0.13        14
+
+    accuracy                           0.77       137
+   macro avg       0.76      0.40      0.41       137
+weighted avg       0.76      0.77      0.70       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Saved new best model!
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 2/100: 100%|██████████████████████| 549/549 [42:49<00:00,  4.68s/it, loss=0.0010, main_loss=0.0010]
+
+Epoch 2/100
+Average Training Loss: 0.6121
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.88      0.87      0.88       102
+ Protagonist       0.45      0.62      0.52        21
+    Innocent       0.86      0.43      0.57        14
+
+    accuracy                           0.79       137
+   macro avg       0.73      0.64      0.66       137
+weighted avg       0.81      0.79      0.79       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Saved new best model!
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 3/100: 100%|███████████████████████████████████████████| 549/549 [42:36<00:00,  4.66s/it, loss=2.0621, main_loss=2.0621]
+
+Epoch 3/100
+Average Training Loss: 0.3867
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.87      0.89      0.88       102
+ Protagonist       0.53      0.38      0.44        21
+    Innocent       0.59      0.71      0.65        14
+
+    accuracy                           0.80       137
+   macro avg       0.66      0.66      0.66       137
+weighted avg       0.79      0.80      0.79       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Saved new best model!
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 4/100: 100%|███████████████████████████████████████████| 549/549 [42:35<00:00,  4.65s/it, loss=0.0003, main_loss=0.0003]
+
+Epoch 4/100
+Average Training Loss: 0.1973
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.88      0.90      0.89       102
+ Protagonist       0.48      0.52      0.50        21
+    Innocent       0.89      0.57      0.70        14
+
+    accuracy                           0.81       137
+   macro avg       0.75      0.67      0.69       137
+weighted avg       0.82      0.81      0.81       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Saved new best model!
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 5/100: 100%|███████████████████████████████████████████| 549/549 [42:35<00:00,  4.66s/it, loss=0.0001, main_loss=0.0001]
+
+Epoch 5/100
+Average Training Loss: 0.0940
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.88      0.80      0.84       102
+ Protagonist       0.39      0.62      0.48        21
+    Innocent       0.82      0.64      0.72        14
+
+    accuracy                           0.76       137
+   macro avg       0.70      0.69      0.68       137
+weighted avg       0.80      0.76      0.77       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 6/100: 100%|███████████████████████████████████████████| 549/549 [42:36<00:00,  4.66s/it, loss=0.0008, main_loss=0.0008]
+
+Epoch 6/100
+Average Training Loss: 0.0548
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.85      0.98      0.91       102
+ Protagonist       0.75      0.43      0.55        21
+    Innocent       1.00      0.57      0.73        14
+
+    accuracy                           0.85       137
+   macro avg       0.87      0.66      0.73       137
+weighted avg       0.85      0.85      0.84       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Saved new best model!
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 7/100: 100%|███████████████████████████████████████████| 549/549 [42:36<00:00,  4.66s/it, loss=0.0000, main_loss=0.0000]
+
+Epoch 7/100
+Average Training Loss: 0.0226
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.85      0.96      0.90       102
+ Protagonist       0.90      0.43      0.58        21
+    Innocent       0.75      0.64      0.69        14
+
+    accuracy                           0.85       137
+   macro avg       0.83      0.68      0.73       137
+weighted avg       0.85      0.85      0.83       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 8/100: 100%|███████████████████████████████████████████| 549/549 [42:34<00:00,  4.65s/it, loss=0.0000, main_loss=0.0000]
+
+Epoch 8/100
+Average Training Loss: 0.0225
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.93      0.64      0.76       102
+ Protagonist       0.34      0.86      0.49        21
+    Innocent       0.50      0.50      0.50        14
+
+    accuracy                           0.66       137
+   macro avg       0.59      0.66      0.58       137
+weighted avg       0.79      0.66      0.69       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 9/100: 100%|███████████████████████████████████████████| 549/549 [42:36<00:00,  4.66s/it, loss=0.0000, main_loss=0.0000]
+
+Epoch 9/100
+Average Training Loss: 0.0068
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.89      0.83      0.86       102
+ Protagonist       0.46      0.57      0.51        21
+    Innocent       0.67      0.71      0.69        14
+
+    accuracy                           0.78       137
+   macro avg       0.67      0.71      0.69       137
+weighted avg       0.80      0.78      0.79       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 10/100: 100%|██████████████████████████████████████████| 549/549 [42:35<00:00,  4.66s/it, loss=0.0000, main_loss=0.0000]
+
+Epoch 10/100
+Average Training Loss: 0.0004
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.87      0.90      0.88       102
+ Protagonist       0.53      0.43      0.47        21
+    Innocent       0.71      0.71      0.71        14
+
+    accuracy                           0.81       137
+   macro avg       0.70      0.68      0.69       137
+weighted avg       0.80      0.81      0.80       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 11/100: 100%|██████████████████████████████████████████| 549/549 [42:34<00:00,  4.65s/it, loss=0.0000, main_loss=0.0000]
+
+Epoch 11/100
+Average Training Loss: 0.0001
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.86      0.94      0.90       102
+ Protagonist       0.57      0.38      0.46        21
+    Innocent       0.83      0.71      0.77        14
+
+    accuracy                           0.83       137
+   macro avg       0.76      0.68      0.71       137
+weighted avg       0.82      0.83      0.82       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Current learning rate: 5e-05
+--------------------------------------------------
+Epoch 12/100: 100%|██████████████████████████████████████████| 549/549 [42:36<00:00,  4.66s/it, loss=0.0000, main_loss=0.0000]
+
+Epoch 12/100
+Average Training Loss: 0.0429
+
+Main Class Classification Report:
+              precision    recall  f1-score   support
+
+  Antagonist       0.82      0.96      0.89       102
+ Protagonist       0.58      0.33      0.42        21
+    Innocent       1.00      0.43      0.60        14
+
+    accuracy                           0.81       137
+   macro avg       0.80      0.57      0.64       137
+weighted avg       0.80      0.81      0.79       137
+
+
+Subclass Accuracies:
+Antagonist: 0.4502
+Protagonist: 0.5873
+Innocent: 0.7679
+Current learning rate: 5e-05
