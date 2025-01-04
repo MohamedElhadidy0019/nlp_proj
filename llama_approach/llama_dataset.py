@@ -8,6 +8,8 @@ from tqdm import tqdm
 import numpy as np
 from torch.optim.lr_scheduler import ReduceLROnPlateau 
 from sklearn.metrics import confusion_matrix, classification_report
+from ast import literal_eval
+import pandas as pd
 
 class EntityDataset(Dataset):
     def __init__(self, data_file: str, tokenizer, txt_file_path: str):
@@ -19,11 +21,23 @@ class EntityDataset(Dataset):
         print("Loading dataset...")
         with open(data_file, 'r') as f:
             lines = f.readlines()
-            
-        for line in tqdm(lines, desc="Processing files"):
-            fields = line.strip().split(',')
-            text_file, entity, start_pos, end_pos, main_class, *subclasses = fields
-            
+        df = pd.read_csv(data_file)
+
+        for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing rows", unit="row", colour="green"):            #article_id,entity_mention,start_offset,end_offset,main_role,fine_grained_roles
+
+            text_file = row['article_id']
+            entity = row['entity_mention']
+            start_pos = row['start_offset']
+            end_pos = row['end_offset']
+            main_class = row['main_role']
+            subclasses = literal_eval(row['fine_grained_roles'])
+            # if (index %8 == 0):
+            #     print(f"Entity: {entity}")
+            #     print(f"Start position: {start_pos}")
+            #     print(f"End position: {end_pos}")
+            #     print(f"Main class: {main_class}")
+            #     print(f"Subclasses: {subclasses}")
+
             try:
                 assert isinstance(text_file, str)
                 assert isinstance(entity, str)
@@ -32,7 +46,7 @@ class EntityDataset(Dataset):
                 assert isinstance(main_class, str)
                 assert isinstance(subclasses, list)
             except AssertionError:
-                print(f"Error processing line: {line}")
+                print(f"Error processing row: {row}")
                 continue
 
             text_file = os.path.join(txt_file_path, text_file)

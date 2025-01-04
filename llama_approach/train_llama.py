@@ -12,13 +12,100 @@ from sklearn.metrics import confusion_matrix, classification_report
 from llama_dataset import EntityDataset
 from llama_model import EntityClassifier
 from copy import deepcopy
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from dotenv import load_dotenv 
 TXT_FILE_PATH = '/home/mohamed/repos/nlp_proj/EN/raw-documents'
 load_dotenv()
 ACCESS_TOKEN = os.getenv("HUGGING_TOKEN")
 
-def train_model(train_file: str, val_file:str, article_txt_path: str, epochs: int = 100, batch_size: int = 1, learning_rate: float = 5e-5):
+def plot_confusion_matrix(cm, class_names,epoch_num:int, logs_path:str, title="Confusion Matrix"):
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
+    plt.xlabel('Predicted Labels')
+    plt.ylabel('True Labels')
+    plt.title(title)
+    # plt.show()
+    plt.savefig(os.path.join(logs_path, f'confusion_matrix_{epoch_num}.png'))
+
+def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.device):
+    """
+    Evaluate the model on the provided dataset.
+
+    Args:
+        model (nn.Module): The model to evaluate.
+        dataloader (DataLoader): Dataloader containing the evaluation dataset.
+        device (torch.device): Device to run the evaluation on.
+
+    Returns:
+        dict: A dictionary containing accuracy, F1 score, confusion matrices, and classification reports.
+    """
+    model.eval()
+    all_preds_main = []
+    all_targets_main = []
+    all_preds_sub = []
+    all_targets_sub = []
+
+    main_classes = ['Antagonist', 'Protagonist', 'Innocent']
+    subclass_indices = {}
+
+    for idx, batch in enumerate(tqdm(dataloader, desc="Evaluating")):
+        input_ids = batch['input_ids'].to(device)
+        attention_mask = batch['attention_mask'].to(device)
+        entity_start_pos = batch['entity_start_pos'].to(device)
+        entity_end_pos = batch['entity_end_pos'].to(device)
+
+        main_class_targets = [main_classes.index(cls) for cls in batch['main_class']]
+        main_class_targets = torch.tensor(main_class_targets).to(device)
+
+        with torch.no_grad():
+            main_class_logits, antagonist_logits, protagonist_logits, innocent_logits = model(
+                input_ids, attention_mask, entity_start_pos, entity_end_pos
+            )
+            predictions = torch.argmax(main_class_logits, dim=1)
+
+        all_preds_main.extend(predictions.cpu().tolist())
+        all_targets_main.extend(main_class_targets.cpu().tolist())
+
+        # Process subclasses
+        for i, subclasses in enumerate(batch['subclasses']):
+            for subclass in subclasses:
+                if subclass not in subclass_indices:
+                    subclass_indices[subclass] = len(subclass_indices)
+
+                all_preds_sub.append(predictions[i].item())
+                all_targets_sub.append(subclass_indices[subclass])
+
+    # Calculate metrics for main class
+    main_class_acc = np.mean(np.array(all_preds_main) == np.array(all_targets_main))
+    main_class_f1 = classification_report(all_targets_main, all_preds_main, target_names=main_classes, output_dict=True)['weighted avg']['f1-score']
+    main_class_conf_matrix = confusion_matrix(all_targets_main, all_preds_main)
+
+    # Calculate metrics for subclasses
+    subclass_conf_matrix = confusion_matrix(all_targets_sub, all_preds_sub, labels=list(subclass_indices.values()))
+    subclass_classification_report = classification_report(
+        all_targets_sub,
+        all_preds_sub,
+        labels=list(subclass_indices.values()),
+        target_names=list(subclass_indices.keys()),
+        output_dict=True
+    )
+
+    return {
+        'main_class': {
+            'accuracy': main_class_acc,
+            'f1_score': main_class_f1,
+            'confusion_matrix': main_class_conf_matrix,
+            'classification_report': classification_report(all_targets_main, all_preds_main, target_names=main_classes)
+        },
+        'subclasses': {
+            'confusion_matrix': subclass_conf_matrix,
+            'classification_report': subclass_classification_report
+        }
+    }
+
+def train_model(train_file: str, val_file:str, article_txt_path: str, model_save_path:str, logs_path:str, epochs: int = 100, batch_size: int = 1, learning_rate: float = 5e-5):
     main_classes = ['Antagonist', 'Protagonist', 'Innocent']
     subclasses = {
             'Antagonist': ['Instigator', 'Conspirator', 'Tyrant', 'Foreign Adversary', 
@@ -35,11 +122,11 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, epochs: in
     tokenizer =  AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B", token=ACCESS_TOKEN)
     tokenizer.pad_token = tokenizer.eos_token
     
-    # train_dataset = EntityDataset(train_file, tokenizer, article_txt_path)
+    train_dataset = EntityDataset(train_file, tokenizer, article_txt_path)
     val_dataset = EntityDataset(val_file, tokenizer, article_txt_path)
-    train_dataset = deepcopy(val_dataset)
-    val_subset_indices = random.sample(range(len(val_dataset)), int(0.1 * len(val_dataset)))
-    val_dataset = Subset(val_dataset, val_subset_indices)
+    # train_dataset = deepcopy(val_dataset)
+    # val_subset_indices = random.sample(range(len(val_dataset)), int(0.1 * len(val_dataset)))
+    # val_dataset = Subset(val_dataset, val_subset_indices)
     print(f'len of train = {len(train_dataset)}')
     print(f'len of val = {len(val_dataset)}')
 
@@ -96,6 +183,10 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, epochs: in
     )
 
     model = EntityClassifier(freeze_base=True).to(device)
+    if os.path.exists(os.path.join(model_save_path, 'best_model_state_dict.pth')):
+        model.load_state_dict(torch.load(os.path.join(model_save_path, 'best_model_state_dict.pth')))
+
+    
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=0.01)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3)
     max_grad_norm = 1.0
@@ -151,7 +242,23 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, epochs: in
         subclass_loss = criterion_sub(subclass_logits, subclass_labels)
 
         return main_loss, subclass_loss
-    
+
+    best_val_accuracy = 0.0
+
+    results = evaluate_model(model, val_loader, device)
+    print("Main Class Accuracy:", results['main_class']['accuracy'])
+    print("Main Class F1 Score:", results['main_class']['f1_score'])
+    print("Main Class Classification Report:")
+    print(results['main_class']['classification_report'])
+
+    print("Subclasses Classification Report:")
+    print(results['subclasses']['classification_report'])
+
+    print("Plotting Confusion Matrix for Main Class")
+    plot_confusion_matrix(
+        results['main_class']['confusion_matrix'], 
+        class_names=['Antagonist', 'Protagonist', 'Innocent']
+    )
     for epoch in range(epochs):
         model.train()
         train_loss = 0
@@ -202,28 +309,39 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, epochs: in
         print(f"Average Training Loss: {avg_loss:.4f}")
         # main_accuracy, subclass_accuracies = evaluate_model(model, val_loader, device, dataset)
         
-        # # Save best model
-        # if main_accuracy > best_val_accuracy:
-        #     best_val_accuracy = main_accuracy
-        #     torch.save({
-        #         'epoch': epoch,
-        #         'model_state_dict': model.state_dict(),
-        #         'optimizer_state_dict': optimizer.state_dict(),
-        #         'main_accuracy': main_accuracy,
-        #         'subclass_accuracies': subclass_accuracies
-        #     }, 'best_model.pth')
-        #     print("Saved new best model!")
+        results = evaluate_model(model, val_loader, device)
+        print("Main Class Accuracy:", results['main_class']['accuracy'])
+        print("Main Class F1 Score:", results['main_class']['f1_score'])
+        print("Main Class Classification Report:")
+        print(results['main_class']['classification_report'])
 
+        print("Subclasses Classification Report:")
+        print(results['subclasses']['classification_report'])
+
+        print("Plotting Confusion Matrix for Main Class")
+        plot_confusion_matrix(
+            results['main_class']['confusion_matrix'], 
+            class_names=['Antagonist', 'Protagonist', 'Innocent'],
+            epoch_num=epoch,
+            logs_path=logs_path
+        )
+        main_accuracy = results['main_class']['accuracy']
+        # # Save best model
+        if main_accuracy > best_val_accuracy:
+            best_val_accuracy = main_accuracy
+            save_dir = os.path.join(model_save_path, 'best_model_state_dict.pth')
+            torch.save(model.state_dict(), save_dir)
         print(f"Current learning rate: {optimizer.param_groups[0]['lr']}")
         print("-" * 50)
 
 
 
 def main():
-    data_file = "/home/mohamed/repos/nlp_proj/output.csv"
     train_file = '/home/mohamed/repos/nlp_proj/split/train.csv'
     val_file = '/home/mohamed/repos/nlp_proj/split/val.csv'
     article_txt_path = '/home/mohamed/repos/nlp_proj/split/EN+PT_txt_files'
-    train_model(train_file, val_file, article_txt_path)
+    model_save_path = '/home/mohamed/repos/nlp_proj/llama_save'
+    logs_path = '/home/mohamed/repos/nlp_proj/llama_logs'
+    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path)
 if __name__ == '__main__':
     main()

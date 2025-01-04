@@ -1,4 +1,3 @@
-article_id,entity_mention,start_offset,end_offset,main_role,fine_grained_roles
 EN_CC_100005.txt,Stopp Oljeletinga,1700,1716,Antagonist,['Terrorist']
 EN_CC_100005.txt,COP27,3657,3661,Antagonist,['Corrupt']
 EN_UA_014637.txt,Wagner Group,539,550,Antagonist,['Corrupt']

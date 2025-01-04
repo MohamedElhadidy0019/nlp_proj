@@ -29,7 +29,7 @@ def process_row(row):
         return None
 
 # Load the dataset
-file_path = '/home/mohamed/repos/nlp_proj/combined_file.csv'  # Replace with your dataset file path
+file_path = '/home/mohamed/repos/nlp_proj/all_data_cleaned.csv'  # Replace with your dataset file path
 with open(file_path, 'r') as file:
     data = [process_row(line) for line in file]
 
