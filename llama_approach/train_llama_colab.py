@@ -260,7 +260,8 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
 
         return main_loss, subclass_loss
 
-    best_val_accuracy = 0.0
+    results_before = evaluate_model(model, val_loader, device)
+    best_val_accuracy = results_before['main_class']['accuracy']
 
     now = datetime.now() # Format date and time 
     current_date = now.strftime("%B %d, %Y") # Full month name, day, year 
