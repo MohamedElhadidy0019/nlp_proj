@@ -198,7 +198,10 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
 
     model = EntityClassifier(freeze_base=True).to(device)
     if os.path.exists(os.path.join(model_save_path, 'best_model_state_dict.pth')):
+        print(f'Loading best model from {os.path.join(model_save_path, "best_model_state_dict.pth")}')
         model.load_state_dict(torch.load(os.path.join(model_save_path, 'best_model_state_dict.pth')))
+    else:
+        print('No best model found, training from scratch')
 
     
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=0.01)
@@ -366,6 +369,6 @@ def main():
     article_txt_path = '/content/nlp_proj/split/EN+PT_txt_files'
     model_save_path = '/content/drive/MyDrive/nlp_llama/llama_save'
     logs_path = '/content/drive/MyDrive/nlp_llama/llama_logs'
-    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, 10, 2)
+    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, 10, 4)
 if __name__ == '__main__':
     main()
