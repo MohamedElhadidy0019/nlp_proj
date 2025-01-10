@@ -257,7 +257,9 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
     print("Plotting Confusion Matrix for Main Class")
     plot_confusion_matrix(
         results['main_class']['confusion_matrix'], 
-        class_names=['Antagonist', 'Protagonist', 'Innocent']
+        class_names=['Antagonist', 'Protagonist', 'Innocent'],
+        epoch_num=epoch,
+        logs_path=logs_path
     )
     for epoch in range(epochs):
         model.train()

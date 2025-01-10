@@ -47,6 +47,10 @@ class EntityClassifier(nn.Module):
         if freeze_base:
             for param in self.llama.parameters():
                 param.requires_grad = False
+        last_layer = self.llama.layers[-1]
+        # print(last_layer)
+        for param in last_layer.parameters():
+            param.requires_grad = True
         
         # Classification heads
         hidden_size = 2048  # Llama-2 3.2B hidden size
