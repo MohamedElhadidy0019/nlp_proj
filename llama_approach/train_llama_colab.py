@@ -34,6 +34,34 @@ TXT_FILE_PATH = '/home/mohamed/repos/nlp_proj/EN/raw-documents'
 load_dotenv()
 ACCESS_TOKEN = os.getenv("HUGGING_TOKEN")
 
+def output_evaluation_results(results: Dict, logs_path:str, epoch:int):
+    print("Main Class Accuracy:", results['main_class']['accuracy'])
+    print("Main Class F1 Score:", results['main_class']['f1_score'])
+    print("Main Class Classification Report:")
+    print(results['main_class']['classification_report'])
+
+    print("Subclasses Classification Report:")
+    print(results['subclasses']['classification_report'])
+    with open(txt_logs_path, 'a') as f:
+        f.write("-" * 10+'\n')
+        f.write("Validation Results\n")
+        f.write("Main Class Accuracy: "+str(results['main_class']['accuracy'])+'\n')
+        f.write("Main Class F1 Score: "+str(results['main_class']['f1_score'])+'\n')
+        f.write("Main Class Classification Report:\n")
+        f.write(str(results['main_class']['classification_report'])+'\n')
+        f.write("Subclasses Classification Report:\n")
+        f.write(str(results['subclasses']['classification_report'])+'\n')
+        f.write(str(results['subclasses']['statistics'])+'\n')
+        f.write("-" * 10+'\n')
+
+    print("Plotting Confusion Matrix for Main Class")
+    plot_confusion_matrix(
+        results['main_class']['confusion_matrix'], 
+        class_names=['Antagonist', 'Protagonist', 'Innocent'],
+        epoch_num=epoch,
+        logs_path=logs_path
+    )
+    pass
 def plot_confusion_matrix(cm, class_names,epoch_num:int, logs_path:str, title="Confusion Matrix"):
     plt.figure(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
@@ -63,6 +91,8 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
 
     main_classes = ['Antagonist', 'Protagonist', 'Innocent']
     subclass_indices = {}
+    subclass_stats = {}
+
 
     for idx, batch in enumerate(tqdm(dataloader, desc="Evaluating")):
         input_ids = batch['input_ids'].to(device)
@@ -90,6 +120,21 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
 
                 all_preds_sub.append(predictions[i].item())
                 all_targets_sub.append(subclass_indices[subclass])
+         # Process subclasses
+        for main_class, sub_classes in subclasses.items():
+            for sub_class in sub_classes:
+                subclass_stats[sub_class] = {'occurrences': 0, 'correct_predictions': 0}
+
+        for i, subclasses_list in enumerate(batch['subclasses']):
+            predicted_main_class = main_classes[predictions[i].item()]
+            actual_main_class = main_classes[main_class_targets[i].item()]
+            for subclass in subclasses_list:
+                subclass_stats[subclass]['occurrences'] += 1
+                if predicted_main_class == actual_main_class and subclass in subclasses[predicted_main_class]:
+                    subclass_stats[subclass]['correct_predictions'] += 1
+
+        
+
 
     # Calculate metrics for main class
     main_class_acc = np.mean(np.array(all_preds_main) == np.array(all_targets_main))
@@ -115,7 +160,9 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
         },
         'subclasses': {
             'confusion_matrix': subclass_conf_matrix,
-            'classification_report': subclass_classification_report
+            'classification_report': subclass_classification_report,
+            'statistics': subclass_stats
+
         }
     }
 
@@ -260,8 +307,6 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
 
         return main_loss, subclass_loss
 
-    results_before = evaluate_model(model, val_loader, device)
-    best_val_accuracy = results_before['main_class']['accuracy']
 
     now = datetime.now() # Format date and time 
     current_date = now.strftime("%B %d, %Y") # Full month name, day, year 
@@ -269,6 +314,12 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
     with open(txt_logs_path, 'a') as f:
         f.write(f"Today's date is: {current_date}\n")
         f.write(f"Current time is: {current_time}\n")
+
+    
+    results_before = evaluate_model(model, val_loader, device)
+    output_evaluation_results(results_before, logs_path, 0)
+    best_val_accuracy = results_before['main_class']['accuracy']
+    return
     for epoch in range(epochs):
         model.train()
         train_loss = 0
@@ -324,31 +375,7 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
         # main_accuracy, subclass_accuracies = evaluate_model(model, val_loader, device, dataset)
         if epoch %3 == 0:
             results = evaluate_model(model, val_loader, device)
-            print("Main Class Accuracy:", results['main_class']['accuracy'])
-            print("Main Class F1 Score:", results['main_class']['f1_score'])
-            print("Main Class Classification Report:")
-            print(results['main_class']['classification_report'])
-
-            print("Subclasses Classification Report:")
-            print(results['subclasses']['classification_report'])
-            with open(txt_logs_path, 'a') as f:
-                f.write("-" * 10+'\n')
-                f.write("Validation Results\n")
-                f.write("Main Class Accuracy: "+str(results['main_class']['accuracy'])+'\n')
-                f.write("Main Class F1 Score: "+str(results['main_class']['f1_score'])+'\n')
-                f.write("Main Class Classification Report:\n")
-                f.write(str(results['main_class']['classification_report'])+'\n')
-                f.write("Subclasses Classification Report:\n")
-                f.write(str(results['subclasses']['classification_report'])+'\n')
-                f.write("-" * 10+'\n')
-
-            print("Plotting Confusion Matrix for Main Class")
-            plot_confusion_matrix(
-                results['main_class']['confusion_matrix'], 
-                class_names=['Antagonist', 'Protagonist', 'Innocent'],
-                epoch_num=epoch,
-                logs_path=logs_path
-            )
+            output_evaluation_results(results, logs_path, epoch)
             main_accuracy = results['main_class']['accuracy']
             # # Save best model
             if main_accuracy > best_val_accuracy:
