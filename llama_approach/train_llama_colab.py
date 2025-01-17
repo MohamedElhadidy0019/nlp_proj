@@ -18,7 +18,6 @@ from datetime import datetime
 
 # Get current date and time
 now = datetime.now()
-txt_logs_path = '/content/drive/MyDrive/nlp_llama/llama_logs/logs.txt'
 
 # # Format date and time
 # current_date = now.strftime("%B %d, %Y")  # Full month name, day, year
@@ -34,7 +33,7 @@ TXT_FILE_PATH = '/home/mohamed/repos/nlp_proj/EN/raw-documents'
 load_dotenv()
 ACCESS_TOKEN = os.getenv("HUGGING_TOKEN")
 
-def output_evaluation_results(results: Dict, logs_path:str, epoch:int):
+def output_evaluation_results(results: Dict, logs_path:str, txt_logs_path, epoch:int):
     print("Main Class Accuracy:", results['main_class']['accuracy'])
     print("Main Class F1 Score:", results['main_class']['f1_score'])
     print("Main Class Classification Report:")
@@ -90,6 +89,13 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
     all_targets_sub = []
 
     main_classes = ['Antagonist', 'Protagonist', 'Innocent']
+    subclasses = {
+            'Antagonist': ['Instigator', 'Conspirator', 'Tyrant', 'Foreign Adversary', 
+                          'Traitor', 'Spy', 'Saboteur', 'Corrupt', 'Incompetent', 
+                          'Terrorist', 'Deceiver', 'Bigot'],
+            'Protagonist': ['Guardian', 'Martyr', 'Peacemaker', 'Rebel', 'Underdog', 'Virtuous'],
+            'Innocent': ['Forgotten', 'Exploited', 'Victim', 'Scapegoat']
+        }
     subclass_indices = {}
     subclass_stats = {}
 
@@ -166,15 +172,10 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
         }
     }
 
-def train_model(train_file: str, val_file:str, article_txt_path: str, model_save_path:str, logs_path:str, epochs: int = 100, batch_size: int = 1, learning_rate: float = 5e-5):
+def train_model(train_file: str, val_file:str, article_txt_path: str, model_save_path:str, logs_path:str,txt_logs_path:str,
+                epochs: int = 100, batch_size: int = 1, learning_rate: float = 5e-5):
     main_classes = ['Antagonist', 'Protagonist', 'Innocent']
-    subclasses = {
-            'Antagonist': ['Instigator', 'Conspirator', 'Tyrant', 'Foreign Adversary', 
-                          'Traitor', 'Spy', 'Saboteur', 'Corrupt', 'Incompetent', 
-                          'Terrorist', 'Deceiver', 'Bigot'],
-            'Protagonist': ['Guardian', 'Martyr', 'Peacemaker', 'Rebel', 'Underdog', 'Virtuous'],
-            'Innocent': ['Forgotten', 'Exploited', 'Victim', 'Scapegoat']
-        }
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # device = torch.device("cpu")
     print(f"Using device: {device}")
@@ -315,9 +316,13 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
         f.write(f"Today's date is: {current_date}\n")
         f.write(f"Current time is: {current_time}\n")
 
+    results_before = evaluate_model(model, train_loader, device)
+    output_evaluation_results(results_before, logs_path, txt_logs_path, 0)
+    return
+    
     
     results_before = evaluate_model(model, val_loader, device)
-    output_evaluation_results(results_before, logs_path, 0)
+    output_evaluation_results(results_before, logs_path,txt_logs_path, 0)
     best_val_accuracy = results_before['main_class']['accuracy']
     return
     for epoch in range(epochs):
@@ -375,7 +380,7 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
         # main_accuracy, subclass_accuracies = evaluate_model(model, val_loader, device, dataset)
         if epoch %3 == 0:
             results = evaluate_model(model, val_loader, device)
-            output_evaluation_results(results, logs_path, epoch)
+            output_evaluation_results(results, logs_path,txt_logs_path, epoch)
             main_accuracy = results['main_class']['accuracy']
             # # Save best model
             if main_accuracy > best_val_accuracy:
@@ -397,6 +402,16 @@ def main():
     article_txt_path = '/content/nlp_proj/split/EN+PT_txt_files'
     model_save_path = '/content/drive/MyDrive/nlp_llama/llama_save'
     logs_path = '/content/drive/MyDrive/nlp_llama/llama_logs'
-    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, 10, 8)
+    txt_logs_path = '/content/drive/MyDrive/nlp_llama/llama_logs/logs.txt'
+
+    #----------------------------------------------------------
+    # train_file = '/home/mohamed/repos/nlp_proj/split/train.csv'
+    # val_file = '/home/mohamed/repos/nlp_proj/split/val.csv'
+    # article_txt_path = '/home/mohamed/repos/nlp_proj/split/EN+PT_txt_files'
+    # model_save_path = '/home/mohamed/repos/nlp_proj/split/EN+PT_txt_files'
+    # logs_path = '/home/mohamed/repos/nlp_proj/llama_logs'
+    # txt_logs_path = '/home/mohamed/repos/nlp_proj/llama_logs/logs.txt'
+
+    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, txt_logs_path, 10, 8)
 if __name__ == '__main__':
     main()
