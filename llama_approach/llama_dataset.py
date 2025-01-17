@@ -19,8 +19,8 @@ class EntityDataset(Dataset):
         self.max_length = 4096  # Extended context length
         
         print("Loading dataset...")
-        with open(data_file, 'r') as f:
-            lines = f.readlines()
+        # with open(data_file, 'r') as f:
+        #     lines = f.readlines()
         df = pd.read_csv(data_file)
 
         for index, row in tqdm(df.iterrows(), total=len(df), desc="Processing rows", unit="row", colour="green"):            #article_id,entity_mention,start_offset,end_offset,main_role,fine_grained_roles

@@ -69,7 +69,6 @@ def plot_confusion_matrix(cm, class_names,epoch_num:int, logs_path:str, title="C
     plt.title(title)
     # plt.show()
     plt.savefig(os.path.join(logs_path, f'confusion_matrix_{epoch_num}.png'))
-
 def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.device):
     """
     Evaluate the model on the provided dataset.
@@ -89,16 +88,17 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
     all_targets_sub = []
 
     main_classes = ['Antagonist', 'Protagonist', 'Innocent']
-    subclasses = {
-            'Antagonist': ['Instigator', 'Conspirator', 'Tyrant', 'Foreign Adversary', 
-                          'Traitor', 'Spy', 'Saboteur', 'Corrupt', 'Incompetent', 
-                          'Terrorist', 'Deceiver', 'Bigot'],
-            'Protagonist': ['Guardian', 'Martyr', 'Peacemaker', 'Rebel', 'Underdog', 'Virtuous'],
-            'Innocent': ['Forgotten', 'Exploited', 'Victim', 'Scapegoat']
-        }
+    subclass_structure = {  # Renamed from 'subclasses' to 'subclass_structure'
+        'Antagonist': ['Instigator', 'Conspirator', 'Tyrant', 'Foreign Adversary', 
+                       'Traitor', 'Spy', 'Saboteur', 'Corrupt', 'Incompetent', 
+                       'Terrorist', 'Deceiver', 'Bigot'],
+        'Protagonist': ['Guardian', 'Martyr', 'Peacemaker', 'Rebel', 'Underdog', 'Virtuous'],
+        'Innocent': ['Forgotten', 'Exploited', 'Victim', 'Scapegoat']
+    }
     subclass_indices = {}
-    subclass_stats = {}
-
+    subclass_stats = {subclass: {'occurrences': 0, 'correct_predictions': 0} 
+                      for subclasses in subclass_structure.values() 
+                      for subclass in subclasses}
 
     for idx, batch in enumerate(tqdm(dataloader, desc="Evaluating")):
         input_ids = batch['input_ids'].to(device)
@@ -118,29 +118,14 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
         all_preds_main.extend(predictions.cpu().tolist())
         all_targets_main.extend(main_class_targets.cpu().tolist())
 
-        # Process subclasses
-        for i, subclasses in enumerate(batch['subclasses']):
-            for subclass in subclasses:
-                if subclass not in subclass_indices:
-                    subclass_indices[subclass] = len(subclass_indices)
-
-                all_preds_sub.append(predictions[i].item())
-                all_targets_sub.append(subclass_indices[subclass])
-         # Process subclasses
-        for main_class, sub_classes in subclasses.items():
-            for sub_class in sub_classes:
-                subclass_stats[sub_class] = {'occurrences': 0, 'correct_predictions': 0}
-
-        for i, subclasses_list in enumerate(batch['subclasses']):
+        # Process subclass statistics
+        for i, subclasses_list in enumerate(batch['subclasses']):  # Renamed from 'subclasses'
             predicted_main_class = main_classes[predictions[i].item()]
             actual_main_class = main_classes[main_class_targets[i].item()]
             for subclass in subclasses_list:
                 subclass_stats[subclass]['occurrences'] += 1
-                if predicted_main_class == actual_main_class and subclass in subclasses[predicted_main_class]:
+                if predicted_main_class == actual_main_class and subclass in subclass_structure[predicted_main_class]:
                     subclass_stats[subclass]['correct_predictions'] += 1
-
-        
-
 
     # Calculate metrics for main class
     main_class_acc = np.mean(np.array(all_preds_main) == np.array(all_targets_main))
@@ -168,13 +153,19 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
             'confusion_matrix': subclass_conf_matrix,
             'classification_report': subclass_classification_report,
             'statistics': subclass_stats
-
         }
     }
 
 def train_model(train_file: str, val_file:str, article_txt_path: str, model_save_path:str, logs_path:str,txt_logs_path:str,
                 epochs: int = 100, batch_size: int = 1, learning_rate: float = 5e-5):
     main_classes = ['Antagonist', 'Protagonist', 'Innocent']
+    subclasses = {  # Renamed from 'subclasses' to 'subclass_structure'
+        'Antagonist': ['Instigator', 'Conspirator', 'Tyrant', 'Foreign Adversary', 
+                       'Traitor', 'Spy', 'Saboteur', 'Corrupt', 'Incompetent', 
+                       'Terrorist', 'Deceiver', 'Bigot'],
+        'Protagonist': ['Guardian', 'Martyr', 'Peacemaker', 'Rebel', 'Underdog', 'Virtuous'],
+        'Innocent': ['Forgotten', 'Exploited', 'Victim', 'Scapegoat']
+    }
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # device = torch.device("cpu")
@@ -412,6 +403,6 @@ def main():
     # logs_path = '/home/mohamed/repos/nlp_proj/llama_logs'
     # txt_logs_path = '/home/mohamed/repos/nlp_proj/llama_logs/logs.txt'
 
-    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, txt_logs_path, 10, 8)
+    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, txt_logs_path, 1, 1)
 if __name__ == '__main__':
     main()
