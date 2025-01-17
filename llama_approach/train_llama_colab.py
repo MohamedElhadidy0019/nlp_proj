@@ -38,9 +38,11 @@ def output_evaluation_results(results: Dict, logs_path:str, txt_logs_path, epoch
     print("Main Class F1 Score:", results['main_class']['f1_score'])
     print("Main Class Classification Report:")
     print(results['main_class']['classification_report'])
+    print(str(results['subclasses']['statistics'])+'\n')
 
-    print("Subclasses Classification Report:")
-    print(results['subclasses']['classification_report'])
+
+    # print("Subclasses Classification Report:")
+    # print(results['subclasses']['classification_report'])
     with open(txt_logs_path, 'a') as f:
         f.write("-" * 10+'\n')
         f.write("Validation Results\n")
@@ -49,7 +51,7 @@ def output_evaluation_results(results: Dict, logs_path:str, txt_logs_path, epoch
         f.write("Main Class Classification Report:\n")
         f.write(str(results['main_class']['classification_report'])+'\n')
         f.write("Subclasses Classification Report:\n")
-        f.write(str(results['subclasses']['classification_report'])+'\n')
+        # f.write(str(results['subclasses']['classification_report'])+'\n')
         f.write(str(results['subclasses']['statistics'])+'\n')
         f.write("-" * 10+'\n')
 
@@ -79,28 +81,30 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
         device (torch.device): Device to run the evaluation on.
 
     Returns:
-        dict: A dictionary containing accuracy, F1 score, confusion matrices, and classification reports.
+        dict: A dictionary containing accuracy, F1 score, confusion matrices, and subclass statistics.
     """
     model.eval()
     all_preds_main = []
     all_targets_main = []
-    all_preds_sub = []
-    all_targets_sub = []
 
     main_classes = ['Antagonist', 'Protagonist', 'Innocent']
-    subclass_structure = {  # Renamed from 'subclasses' to 'subclass_structure'
-        'Antagonist': ['Instigator', 'Conspirator', 'Tyrant', 'Foreign Adversary', 
-                       'Traitor', 'Spy', 'Saboteur', 'Corrupt', 'Incompetent', 
+    main_class_to_subclasses = {
+        'Antagonist': ['Instigator', 'Conspirator', 'Tyrant', 'Foreign Adversary',
+                       'Traitor', 'Spy', 'Saboteur', 'Corrupt', 'Incompetent',
                        'Terrorist', 'Deceiver', 'Bigot'],
         'Protagonist': ['Guardian', 'Martyr', 'Peacemaker', 'Rebel', 'Underdog', 'Virtuous'],
         'Innocent': ['Forgotten', 'Exploited', 'Victim', 'Scapegoat']
     }
-    subclass_indices = {}
-    subclass_stats = {subclass: {'occurrences': 0, 'correct_predictions': 0} 
-                      for subclasses in subclass_structure.values() 
-                      for subclass in subclasses}
 
-    for idx, batch in enumerate(tqdm(dataloader, desc="Evaluating")):
+    # Initialize statistics
+    subclass_stats = {
+        sub_class: {'occurrences': 0, 'true_positives': 0, 'false_positives': 0, 'false_negatives': 0}
+        for sub_classes in main_class_to_subclasses.values()
+        for sub_class in sub_classes
+    }
+
+    # Evaluate model
+    for batch in tqdm(dataloader, desc="Evaluating"):
         input_ids = batch['input_ids'].to(device)
         attention_mask = batch['attention_mask'].to(device)
         entity_start_pos = batch['entity_start_pos'].to(device)
@@ -118,29 +122,47 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
         all_preds_main.extend(predictions.cpu().tolist())
         all_targets_main.extend(main_class_targets.cpu().tolist())
 
-        # Process subclass statistics
-        for i, subclasses_list in enumerate(batch['subclasses']):  # Renamed from 'subclasses'
+        # Process subclass predictions
+        for i, batch_subclasses in enumerate(batch['subclasses']):
             predicted_main_class = main_classes[predictions[i].item()]
             actual_main_class = main_classes[main_class_targets[i].item()]
-            for subclass in subclasses_list:
-                subclass_stats[subclass]['occurrences'] += 1
-                if predicted_main_class == actual_main_class and subclass in subclass_structure[predicted_main_class]:
-                    subclass_stats[subclass]['correct_predictions'] += 1
 
+            if predicted_main_class == actual_main_class:
+                # Select corresponding subclass logits
+                if predicted_main_class == 'Antagonist':
+                    subclass_logits = antagonist_logits[i]
+                elif predicted_main_class == 'Protagonist':
+                    subclass_logits = protagonist_logits[i]
+                elif predicted_main_class == 'Innocent':
+                    subclass_logits = innocent_logits[i]
+
+                # Convert logits to probabilities and apply threshold
+                subclass_probs = torch.sigmoid(subclass_logits)
+                subclass_predictions = (subclass_probs > 0.5).cpu().numpy()
+
+                # Get the predicted and ground truth subclass names
+                predicted_subclasses = [
+                    subclass
+                    for j, subclass in enumerate(main_class_to_subclasses[predicted_main_class])
+                    if subclass_predictions[j]
+                ]
+
+                # Update statistics for true positives and false negatives
+                for subclass in batch_subclasses:
+                    subclass_stats[subclass]['occurrences'] += 1
+                    if subclass in predicted_subclasses:
+                        subclass_stats[subclass]['true_positives'] += 1
+                    else:
+                        subclass_stats[subclass]['false_negatives'] += 1
+
+                # Update statistics for false positives
+                for subclass in predicted_subclasses:
+                    if subclass not in batch_subclasses:
+                        subclass_stats[subclass]['false_positives'] += 1
     # Calculate metrics for main class
     main_class_acc = np.mean(np.array(all_preds_main) == np.array(all_targets_main))
     main_class_f1 = classification_report(all_targets_main, all_preds_main, target_names=main_classes, output_dict=True)['weighted avg']['f1-score']
     main_class_conf_matrix = confusion_matrix(all_targets_main, all_preds_main)
-
-    # Calculate metrics for subclasses
-    subclass_conf_matrix = confusion_matrix(all_targets_sub, all_preds_sub, labels=list(subclass_indices.values()))
-    subclass_classification_report = classification_report(
-        all_targets_sub,
-        all_preds_sub,
-        labels=list(subclass_indices.values()),
-        target_names=list(subclass_indices.keys()),
-        output_dict=True
-    )
 
     return {
         'main_class': {
@@ -150,8 +172,6 @@ def evaluate_model(model: nn.Module, dataloader: DataLoader, device: torch.devic
             'classification_report': classification_report(all_targets_main, all_preds_main, target_names=main_classes)
         },
         'subclasses': {
-            'confusion_matrix': subclass_conf_matrix,
-            'classification_report': subclass_classification_report,
             'statistics': subclass_stats
         }
     }
