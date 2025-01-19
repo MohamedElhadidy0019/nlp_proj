@@ -15,6 +15,7 @@ from copy import deepcopy
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime
+from focal_loss import FocalLoss
 
 # Get current date and time
 now = datetime.now()
@@ -288,7 +289,7 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
         collate_fn=collate_fn
     )
 
-    model = EntityClassifier(freeze_base=True).to(device)
+    model = EntityClassifier(freeze_base=True, subclass_only=True).to(device)
     if os.path.exists(os.path.join(model_save_path, 'best_model_state_dict.pth')):
         print(f'Loading best model from {os.path.join(model_save_path, "best_model_state_dict.pth")}')
         model.load_state_dict(torch.load(os.path.join(model_save_path, 'best_model_state_dict.pth')))
@@ -340,7 +341,9 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
 
         # Compute losses
         criterion_main= nn.CrossEntropyLoss()
-        criterion_sub = nn.BCEWithLogitsLoss()
+        # criterion_sub = nn.BCEWithLogitsLoss()
+        criterion_sub = FocalLoss(alpha=1.0, gamma=3.0)
+        
         # all logitcs to device
         main_class_logits = main_class_logits.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
         subclass_logits = subclass_logits.to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
@@ -360,15 +363,15 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
         f.write(f"Today's date is: {current_date}\n")
         f.write(f"Current time is: {current_time}\n")
 
-    results_before = evaluate_model(model, train_loader, device)
-    output_evaluation_results(results_before, logs_path, txt_logs_path, 0)
-    return
+    # results_before = evaluate_model(model, train_loader, device)
+    # output_evaluation_results(results_before, logs_path, txt_logs_path, 0)
+    # return
     
     
-    results_before = evaluate_model(model, val_loader, device)
-    output_evaluation_results(results_before, logs_path,txt_logs_path, 0)
-    best_val_accuracy = results_before['main_class']['accuracy']
-    return
+    # results_before = evaluate_model(model, val_loader, device)
+    # output_evaluation_results(results_before, logs_path,txt_logs_path, 0)
+    # best_val_accuracy = results_before['main_class']['accuracy']
+    # return
     for epoch in range(epochs):
         model.train()
         train_loss = 0
@@ -388,7 +391,8 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
                     input_ids, attention_mask, entity_start_pos, entity_end_pos
                 )
                 main_loss, subclass_loss = compute_loss(main_class_logits, antagonist_logits, protagonist_logits, innocent_logits, batch)
-                loss = main_loss + subclass_loss
+                # loss = main_loss + subclass_loss
+                loss = subclass_loss
                 
                 
                 if torch.isnan(loss):
@@ -419,23 +423,24 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
         print(f"Average Training Loss: {avg_loss:.4f}")
         with open(txt_logs_path, 'a') as f:
             f.write(f"\nEpoch {epoch+1}/{epochs}\n")
-            f.write(f"Average Training Loss: {avg_loss:.4f}\n")
-
-        # main_accuracy, subclass_accuracies = evaluate_model(model, val_loader, device, dataset)
-        if epoch %3 == 0:
-            results = evaluate_model(model, val_loader, device)
-            output_evaluation_results(results, logs_path,txt_logs_path, epoch)
-            main_accuracy = results['main_class']['accuracy']
-            # # Save best model
-            if main_accuracy > best_val_accuracy:
-                best_val_accuracy = main_accuracy
-                save_dir = os.path.join(model_save_path, 'best_model_state_dict.pth')
-                torch.save(model.state_dict(), save_dir)
-            print(f"Current learning rate: {optimizer.param_groups[0]['lr']}")
-            print("-" * 50)
-            with open(txt_logs_path, 'a') as f:
-                f.write(f"Current learning rate: {optimizer.param_groups[0]['lr']}\n")
-                f.write("-" * 50+'\n')
+            f.write(f"Average Subclass Training Loss: {avg_loss:.4f}\n")
+        save_dir = os.path.join(model_save_path, 'best_model_state_dict_subclass.pth')
+        torch.save(model.state_dict(), save_dir)
+        # # main_accuracy, subclass_accuracies = evaluate_model(model, val_loader, device, dataset)
+        # if epoch %3 == 0:
+        #     results = evaluate_model(model, val_loader, device)
+        #     output_evaluation_results(results, logs_path,txt_logs_path, epoch)
+        #     main_accuracy = results['main_class']['accuracy']
+        #     # # Save best model
+        #     if main_accuracy > best_val_accuracy:
+        #         best_val_accuracy = main_accuracy
+        #         save_dir = os.path.join(model_save_path, 'best_model_state_dict_subclass.pth')
+        #         torch.save(model.state_dict(), save_dir)
+        #     print(f"Current learning rate: {optimizer.param_groups[0]['lr']}")
+        #     print("-" * 50)
+        #     with open(txt_logs_path, 'a') as f:
+        #         f.write(f"Current learning rate: {optimizer.param_groups[0]['lr']}\n")
+        #         f.write("-" * 50+'\n')
 
 
 

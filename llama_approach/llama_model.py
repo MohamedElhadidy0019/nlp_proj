@@ -31,7 +31,7 @@ def create_classifier(hidden_size, num_subclasses):
     )
 
 class EntityClassifier(nn.Module):
-    def __init__(self, freeze_base=True):
+    def __init__(self, freeze_base=True, subclass_only = False):
         super().__init__()
         self.main_classes = ['Antagonist', 'Protagonist', 'Innocent']
         self.subclasses = {
@@ -52,6 +52,7 @@ class EntityClassifier(nn.Module):
         for param in last_layer.parameters():
             param.requires_grad = True
         
+        
         # Classification heads
         hidden_size = 2048  # Llama-2 3.2B hidden size
         
@@ -59,6 +60,12 @@ class EntityClassifier(nn.Module):
         self.antagonist_classifier = create_classifier(hidden_size, len(self.subclasses['Antagonist']))
         self.protagonist_classifier = create_classifier(hidden_size, len(self.subclasses['Protagonist']))
         self.innocent_classifier = create_classifier(hidden_size, len(self.subclasses['Innocent']))
+
+        if subclass_only:
+            for param in self.main_classifier.parameters():
+                param.requires_grad = False
+            for param in self.llama.parameters():
+                param.requires_grad = False
         
 
     def forward(self, input_ids, attention_mask, entity_start_pos, entity_end_pos):
