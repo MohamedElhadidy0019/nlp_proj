@@ -198,11 +198,16 @@ def save_predictions_to_file(predictions, file_path):
             file.write(f"{main_class},{subclasses_str}\n")
 
 def main():
+
+    test_file = '/content/nlp_proj/split/test.csv'
+    article_txt_path = '/content/nlp_proj/split/EN+PT_txt_files'
+    model_path = '/content/drive/MyDrive/nlp_llama/llama_save/best_model_state_dict.pth'
+    txt_output_path = '/content/drive/MyDrive/nlp_llama/og_model.txt'
     #/content/nlp_proj/split/train.csv
-    test_file = '/home/mohamed/repos/nlp_proj/split/test.csv'
-    article_txt_path = '/home/mohamed/repos/nlp_proj/split/EN+PT_txt_files'
-    model_path = '/home/mohamed/repos/nlp_proj/model_weights/best_model_state_dict_subclass.pth'
-    txt_output_path = '/home/mohamed/repos/nlp_proj/model_output/og.txt'
+    # test_file = '/home/mohamed/repos/nlp_proj/split/test.csv'
+    # article_txt_path = '/home/mohamed/repos/nlp_proj/split/EN+PT_txt_files'
+    # model_path = '/home/mohamed/repos/nlp_proj/model_weights/best_model_state_dict_subclass.pth'
+    # txt_output_path = '/home/mohamed/repos/nlp_proj/model_output/og.txt'
     #----------------------------------------------------------
 
     output_dcit = run_model(test_file, article_txt_path, model_path,1)
