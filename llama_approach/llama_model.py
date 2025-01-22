@@ -49,8 +49,8 @@ class EntityClassifier(nn.Module):
                 param.requires_grad = False
         last_layer = self.llama.layers[-1]
         # print(last_layer)
-        for param in last_layer.parameters():
-            param.requires_grad = True
+        # for param in last_layer.parameters():
+        #     param.requires_grad = True
         
         
         # Classification heads
