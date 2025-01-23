@@ -1,4 +1,3 @@
-article_id,entity_mention,start_offset,end_offset,main_role,fine_grained_roles
 EN_UA_300048.txt,HUNTER,74,79,Antagonist,['Corrupt']
 EN_UA_300048.txt,BIDEN FAMILY,114,125,Antagonist,['Corrupt']
 EN_UA_300129.txt,Kremlin,147,153,Antagonist,['Instigator']
