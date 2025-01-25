@@ -116,24 +116,30 @@ def evaluate_predictionss(pred_file, ground_truth_file):
 
 def main():
     
-    # pred_file = '/home/mohamed/repos/nlp_proj/llama_save/og_model.txt'
-    pred_file = '/home/mohamed/repos/nlp_proj/llama_save/subclass_model.txt'
-    ground_truth_file = '/home/mohamed/repos/nlp_proj/llama_save/test.csv'
+    pred_file = '/home/mohamed/repos/nlp_proj/llama_output/og_model.txt'
+    # pred_file = '/home/mohamed/repos/nlp_proj/llama_output/subclass_model.txt'
+    ground_truth_file = '/home/mohamed/repos/nlp_proj/llama_output/test.csv'
 
 
     results = evaluate_predictionss(pred_file, ground_truth_file)
+    main_class_f1 = []
+    subclass_f1 = []
 
     # Print metrics
     print("Main Class Metrics:")
     for main_class, stats in results['main_class'].items():
         print(f"{main_class}: Precision={stats['precision']:.2f}, Recall={stats['recall']:.2f}, F1 Score={stats['f1_score']:.2f}")
+        main_class_f1.append(stats['f1_score'])
 
     print("\nSubclass Metrics:")
+
     for subclass, stats in results['subclasses'].items():
         print(f"{subclass}: Precision={stats['precision']:.2f}, Recall={stats['recall']:.2f}, F1 Score={stats['f1_score']:.2f}")
+        if stats['f1_score'] > 0:
+            subclass_f1.append(stats['f1_score'])
 
-        print(f"\nExact Match Ratio (EMR): {results['EMR']:.2f}")
-
-
+    print(f"\nExact Match Ratio (EMR): {results['EMR']:.2f}")
+    print(f"Average Subclass F1 Score: {sum(subclass_f1) / len(subclass_f1):.2f}")
+    print(f"Average Main Class F1 Score: {sum(main_class_f1) / len(main_class_f1):.2f}")
 if __name__ == '__main__':
     main()
