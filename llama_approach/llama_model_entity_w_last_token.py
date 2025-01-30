@@ -1,4 +1,3 @@
-
 import torch
 import torch.nn as nn
 from transformers import LlamaModel, LlamaTokenizer, AutoTokenizer
@@ -30,6 +29,7 @@ def create_classifier(hidden_size, num_subclasses):
         nn.Linear(512, num_subclasses)
     )
 
+
 class EntityClassifier(nn.Module):
     def __init__(self, freeze_base=True, subclass_only = False):
         super().__init__()
@@ -56,17 +56,23 @@ class EntityClassifier(nn.Module):
         # Classification heads
         hidden_size = 2048  # Llama-2 3.2B hidden size
         
+        self.feature_extractor=nn.Sequential(
+                    nn.Linear(hidden_size*2, hidden_size*2),
+                    nn.LayerNorm(hidden_size*2),
+                    nn.GELU(),
+                    nn.Dropout(0.1),
+                    nn.Linear(hidden_size*2, hidden_size),
+                    nn.LayerNorm(hidden_size),
+                    nn.GELU(),
+                    nn.Dropout(0.1),
+                    nn.Linear(hidden_size, hidden_size)            
+        )
+
         self.main_classifier = create_classifier(hidden_size, len(self.main_classes))
         self.antagonist_classifier = create_classifier(hidden_size, len(self.subclasses['Antagonist']))
         self.protagonist_classifier = create_classifier(hidden_size, len(self.subclasses['Protagonist']))
         self.innocent_classifier = create_classifier(hidden_size, len(self.subclasses['Innocent']))
 
-        if subclass_only:
-            for param in self.main_classifier.parameters():
-                param.requires_grad = False
-            for param in self.llama.parameters():
-                param.requires_grad = False
-        
 
     def forward(self, input_ids, attention_mask, entity_start_pos, entity_end_pos):
         # Get Llama outputs
@@ -76,20 +82,29 @@ class EntityClassifier(nn.Module):
         # Extract entity representations
         batch_size = hidden_states.size(0)
         entity_reprs = []
+        last_hidden_states = []
         
         for i in range(batch_size):
             start = entity_start_pos[i]
             end = entity_end_pos[i]
             entity_repr = hidden_states[i, start:end+1].mean(dim=0)
+            
             entity_reprs.append(entity_repr)
+            last_hidden_states.append(hidden_states[i, -1].unsqueeze(0)[0])
+
         
         entity_reprs = torch.stack(entity_reprs)
+        last_hidden_states = torch.stack(last_hidden_states)
+
+        # Concatenate entity and last hidden state
+        entity_reprs = torch.cat([entity_reprs, last_hidden_states], dim=1)
+        extracted_vector = self.feature_extractor(entity_reprs)
         
         # Get predictions
-        main_class_logits = self.main_classifier(entity_reprs)
-        antagonist_logits = self.antagonist_classifier(entity_reprs)
-        protagonist_logits = self.protagonist_classifier(entity_reprs)
-        innocent_logits = self.innocent_classifier(entity_reprs)
+        main_class_logits = self.main_classifier(extracted_vector)
+        antagonist_logits = self.antagonist_classifier(extracted_vector)
+        protagonist_logits = self.protagonist_classifier(extracted_vector)
+        innocent_logits = self.innocent_classifier(extracted_vector)
 
         
         return main_class_logits, antagonist_logits, protagonist_logits, innocent_logits
