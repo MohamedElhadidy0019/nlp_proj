@@ -361,9 +361,10 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
         f.write(f"Current time is: {current_time}\n")
 
     
-    results_before = evaluate_model(model, val_loader, device)
-    output_evaluation_results(results_before, logs_path,txt_logs_path, 0)
-    best_val_accuracy = results_before['main_class']['accuracy']
+    # results_before = evaluate_model(model, val_loader, device)
+    # output_evaluation_results(results_before, logs_path,txt_logs_path, 0)
+    # best_val_accuracy = results_before['main_class']['accuracy']
+    best_val_accuracy = 0
     
     for epoch in range(epochs):
         model.train()
@@ -425,7 +426,7 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
             # # Save best model
             if main_accuracy > best_val_accuracy:
                 best_val_accuracy = main_accuracy
-                save_dir = os.path.join(model_save_path, 'best_model_state_dict.pth')
+                save_dir = os.path.join(model_save_path, 'best_model_state_dict_w_last_vector.pth')
                 torch.save(model.state_dict(), save_dir)
             print(f"Current learning rate: {optimizer.param_groups[0]['lr']}")
             print("-" * 50)
