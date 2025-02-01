@@ -444,7 +444,7 @@ def main():
     model_save_path = '/content/drive/MyDrive/nlp_llama/llama_save'
     logs_path = '/content/drive/MyDrive/nlp_llama/llama_logs'
     txt_logs_path = '/content/drive/MyDrive/nlp_llama/llama_logs/logs.txt'
-    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, txt_logs_path, 5, 8)
+    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, txt_logs_path, 9, 8)
 
     #----------------------------------------------------------
     # train_file = '/home/mohamed/repos/nlp_proj/split/train.csv'
