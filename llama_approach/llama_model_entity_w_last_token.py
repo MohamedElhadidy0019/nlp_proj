@@ -84,17 +84,27 @@ class EntityClassifier(nn.Module):
         entity_reprs = []
         last_hidden_states = []
         
+
+        # Compute real sequence lengths (excluding padding tokens)
+        seq_lengths = attention_mask.sum(dim=1)  # Shape: (batch_size,)
+
+        # Get indices of the last meaningful token (before padding/EOS)
+        last_token_indices = seq_lengths - 1  # Shape: (batch_size,)
+
+        # Extract the last meaningful hidden states (avoiding EOS/padding issues)
+        last_hidden_states = hidden_states[torch.arange(batch_size), last_token_indices]  # Shape: (batch_size, hidden_size)
+
         for i in range(batch_size):
             start = entity_start_pos[i]
             end = entity_end_pos[i]
             entity_repr = hidden_states[i, start:end+1].mean(dim=0)
             
             entity_reprs.append(entity_repr)
-            last_hidden_states.append(hidden_states[i, -1].unsqueeze(0)[0])
+            # last_hidden_states.append(hidden_states[i, -1].unsqueeze(0)[0])
 
         
         entity_reprs = torch.stack(entity_reprs)
-        last_hidden_states = torch.stack(last_hidden_states)
+        # last_hidden_states = torch.stack(last_hidden_states)
 
         # Concatenate entity and last hidden state
         entity_reprs = torch.cat([entity_reprs, last_hidden_states], dim=1)

@@ -419,7 +419,7 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
             f.write(f"Average Training Loss: {avg_loss:.4f}\n")
 
         # main_accuracy, subclass_accuracies = evaluate_model(model, val_loader, device, dataset)
-        if epoch %3 == 0:
+        if epoch %2 == 0:
             results = evaluate_model(model, val_loader, device)
             output_evaluation_results(results, logs_path,txt_logs_path, epoch)
             main_accuracy = results['main_class']['accuracy']
@@ -437,13 +437,14 @@ def train_model(train_file: str, val_file:str, article_txt_path: str, model_save
 
 
 def main():
-    #/content/nlp_proj/split/train.csv
+    # #/content/nlp_proj/split/train.csv
     train_file = '/content/nlp_proj/split/train.csv'
     val_file = '/content/nlp_proj/split/val.csv'
     article_txt_path = '/content/nlp_proj/split/EN+PT_txt_files'
     model_save_path = '/content/drive/MyDrive/nlp_llama/llama_save'
     logs_path = '/content/drive/MyDrive/nlp_llama/llama_logs'
     txt_logs_path = '/content/drive/MyDrive/nlp_llama/llama_logs/logs.txt'
+    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, txt_logs_path, 5, 8)
 
     #----------------------------------------------------------
     # train_file = '/home/mohamed/repos/nlp_proj/split/train.csv'
@@ -452,7 +453,6 @@ def main():
     # model_save_path = '/home/mohamed/repos/nlp_proj/split/EN+PT_txt_files'
     # logs_path = '/home/mohamed/repos/nlp_proj/llama_logs'
     # txt_logs_path = '/home/mohamed/repos/nlp_proj/llama_logs/logs.txt'
-
-    train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, txt_logs_path, 20, 4)
+    # train_model(train_file, val_file, article_txt_path,model_save_path, logs_path, txt_logs_path, 1, 1)
 if __name__ == '__main__':
     main()
